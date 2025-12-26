@@ -3,7 +3,7 @@
     "id": "hybrid-diagnostics",
     "title": "Hybrid Diagnostics",
     "description": "Advanced hybrid system scans and ECU diagnostics.",
-    "image": "images/services/diagnostics.png"
+    "image": "services/diagnostics.png"
   },
   {
     "id": "battery-check",
