@@ -10,7 +10,7 @@
       "Live data analysis",
       "System health report"
     ],
-    "image": "images/services/diagnostics.png"
+    "image": "diagnostics.png"
   },
   {
     "id": "battery-check",
