@@ -1,16 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   /* ================= SPA NAVIGATION ================= */
-  const pages = document.querySelectorAll('.page');
   const navLinks = document.querySelectorAll('[data-page]');
+  const pages = document.querySelectorAll('.page');
 
-  function showPage(pageId) {
-    pages.forEach(p => p.classList.remove('active'));
+  window.showPage = function (pageId) {
+    pages.forEach(page => page.classList.remove('active'));
     const target = document.getElementById(pageId);
     if (target) target.classList.add('active');
     window.scrollTo(0, 0);
     history.replaceState(null, '', `#${pageId}`);
-  }
+  };
 
   navLinks.forEach(link => {
     link.addEventListener('click', e => {
@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (hash && document.getElementById(hash)) showPage(hash);
   else showPage('home');
 
+
   /* ================= HERO SLIDESHOW ================= */
   const slides = document.querySelectorAll('.slide');
   const dotsContainer = document.querySelector('.dots');
@@ -33,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     slides.forEach((_, i) => {
       const dot = document.createElement('span');
       dot.className = 'dot' + (i === 0 ? ' active' : '');
-      dot.onclick = () => showSlide(i);
+      dot.addEventListener('click', () => showSlide(i));
       dotsContainer.appendChild(dot);
     });
 
@@ -47,8 +48,11 @@ document.addEventListener('DOMContentLoaded', () => {
       currentSlide = index;
     }
 
-    setInterval(() => showSlide((currentSlide + 1) % slides.length), 5000);
+    setInterval(() => {
+      showSlide((currentSlide + 1) % slides.length);
+    }, 5000);
   }
+
 
   /* ================= BOOKING FORM ================= */
   const bookingForm = document.getElementById('bookingForm');
@@ -60,61 +64,73 @@ document.addEventListener('DOMContentLoaded', () => {
         body: new FormData(bookingForm),
         headers: { 'Accept': 'application/json' }
       })
-        .then(res => res.ok ? (alert('Booking submitted!'), bookingForm.reset()) : alert('Booking failed'))
-        .catch(() => alert('Network error'));
+      .then(res => {
+        if (res.ok) {
+          alert('Booking submitted!');
+          bookingForm.reset();
+        } else {
+          alert('Booking failed!');
+        }
+      })
+      .catch(() => alert('Network error'));
     });
   }
 
-  /* ================= LOAD SERVICES ================= */
+
+  /* ================= MPESA COPY ================= */
+  window.copyText = text => {
+    navigator.clipboard.writeText(text)
+      .then(() => alert('Copied: ' + text))
+      .catch(() => alert('Copy failed'));
+  };
+
+
+  /* ================= SERVICES (FIXED PROPERLY) ================= */
   const serviceGrid = document.querySelector('.service-grid');
   const serviceDetail = document.getElementById('service-detail');
+  let servicesCache = [];
 
-  fetch('services.json')
-    .then(res => res.json())
-    .then(services => {
-      if (!serviceGrid) return;
+  if (serviceGrid) {
+    fetch('services.json')
+      .then(res => res.json())
+      .then(data => {
+        servicesCache = data;
+        serviceGrid.innerHTML = '';
 
-      serviceGrid.innerHTML = '';
+        data.forEach(service => {
+          const card = document.createElement('div');
+          card.className = 'service-card';
+          card.innerHTML = `
+            <img src="${service.image}" alt="${service.title}" style="width:100px;height:100px;object-fit:contain;">
+            <h3>${service.title}</h3>
+            <p>${service.description}</p>
+            <button class="read-more-btn" data-id="${service.id}">Read More</button>
+          `;
+          serviceGrid.appendChild(card);
+        });
 
-      services.forEach(service => {
-        const card = document.createElement('div');
-        card.className = 'service-card';
-        card.innerHTML = `
-          <img src="${service.image}" alt="${service.title}">
-          <h3>${service.title}</h3>
-          <p>${service.description}</p>
-          <button class="read-more-btn">Read More</button>
-          <button class="book-now-btn">Book Now</button>
-        `;
+        document.querySelectorAll('.read-more-btn').forEach(btn => {
+          btn.addEventListener('click', () => openServicePage(btn.dataset.id));
+        });
+      })
+      .catch(err => console.error('Service error:', err));
+  }
 
-        // Read More
-        card.querySelector('.read-more-btn').onclick = () => openService(service);
-
-        // Book Now
-        card.querySelector('.book-now-btn').onclick = () => {
-          showPage('booking');
-          const msg = bookingForm?.querySelector('textarea[name="message"]');
-          if (msg) msg.value = `Booking request for: ${service.title}`;
-        };
-
-        serviceGrid.appendChild(card);
-      });
-    });
-
-  /* ================= SERVICE DETAIL ================= */
-  function openService(service) {
-    if (!serviceDetail) return;
+  function openServicePage(id) {
+    const service = servicesCache.find(s => s.id === id);
+    if (!service || !serviceDetail) return;
 
     serviceDetail.innerHTML = `
       <h2>${service.title}</h2>
-      <img src="${service.image}" alt="${service.title}">
+      <img src="${service.image}" alt="${service.title}" style="max-width:100%;margin:20px 0;">
       <p>${service.description}</p>
-      <button id="back-services">← Back to Services</button>
+      <button id="back-to-services">Back to Services</button>
     `;
 
     showPage('service-detail');
 
-    document.getElementById('back-services').onclick = () => showPage('services');
+    document.getElementById('back-to-services')
+      .addEventListener('click', () => showPage('services'));
   }
 
 });
