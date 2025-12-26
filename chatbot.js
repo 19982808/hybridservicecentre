@@ -19,10 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
     addMessage(text, 'user-message');
     input.value = '';
     messages.scrollTop = messages.scrollHeight;
-
     setTimeout(() => processMessage(text.toLowerCase()), 400);
   }
-
   sendBtn.addEventListener('click', sendMessage);
   input.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
 
@@ -50,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ===== SPA page switching =====
-  function showPage(pageId) {
+  window.showPage = function(pageId) {
     const pages = document.querySelectorAll('.page');
     pages.forEach(p => p.classList.remove('active'));
     const target = document.getElementById(pageId);
@@ -71,31 +69,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
           data.forEach(service => {
             const content = `
-              <div style="border:1px solid #ccc; padding:8px; margin:5px 0; border-radius:8px;">
+              <div style="border:1px solid #ccc; padding:8px; margin:5px 0; border-radius:8px; overflow:hidden;">
                 <img src="${service.image}" alt="${service.title}" style="width:80px; height:80px; object-fit:contain; float:left; margin-right:10px;">
                 <strong>${service.title}</strong><br>
-                <small>${service.description}</small><br>
+                <small>${service.shortDescription}</small><br>
                 <button class="service-chat-btn" data-id="${service.id}">Read More</button>
                 <button class="book-service-btn" data-title="${service.title}">Book Now</button>
                 <div style="clear:both;"></div>
               </div>
             `;
             addMessage(content, 'bot-message', true);
-          });
-
-          document.querySelectorAll('.service-chat-btn').forEach(btn => {
-            btn.addEventListener('click', () => openServicePage(btn.dataset.id));
-          });
-
-          document.querySelectorAll('.book-service-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-              showPage('booking');
-              if (bookingForm) {
-                const msgField = bookingForm.querySelector('textarea[name="message"]');
-                if (msgField) msgField.value = `Booking request for: ${btn.dataset.title}`;
-              }
-              addMessage(`Booking form opened for: ${btn.dataset.title}`, 'bot-message');
-            });
           });
         });
     } else if (text.includes('book')) {
@@ -112,33 +95,38 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ===== Open service detail page from chat =====
-  function openServicePage(id) {
-    fetch('services.json')
-      .then(res => res.json())
-      .then(data => {
-        const service = data.find(s => s.id === id);
-        if (service) {
-          let serviceDetail = document.getElementById('service-detail');
-          if (!serviceDetail) {
-            serviceDetail = document.createElement('section');
-            serviceDetail.id = 'service-detail';
-            serviceDetail.className = 'page';
-            document.body.appendChild(serviceDetail);
-          }
+  // ===== Event delegation for dynamic buttons inside chatbot =====
+  messages.addEventListener('click', e => {
+    // Read More
+    if (e.target.classList.contains('service-chat-btn')) {
+      const id = e.target.dataset.id;
+      fetch('services.json')
+        .then(res => res.json())
+        .then(data => {
+          const service = data.find(s => s.id === id);
+          if (!service) return;
 
-          serviceDetail.innerHTML = `
-            <div class="container">
-              <h2>${service.title}</h2>
-              <img src="${service.image}" alt="${service.title}" style="max-width:100%; margin:20px 0;">
-              <p>${service.description}</p>
-              <button onclick="showPage('services')">Back to Services</button>
-            </div>
+          const serviceDetail = document.getElementById('service-detail');
+          serviceDetail.querySelector('.container').innerHTML = `
+            <h2>${service.title}</h2>
+            <img src="${service.image}" alt="${service.title}" style="max-width:100%; margin:20px 0;">
+            <p>${service.fullDescription}</p>
+            <button onclick="showPage('services')">Back to Services</button>
           `;
           showPage('service-detail');
-        }
-      });
-  }
+        });
+    }
+
+    // Book Now
+    if (e.target.classList.contains('book-service-btn')) {
+      showPage('booking');
+      if (bookingForm) {
+        const msgField = bookingForm.querySelector('textarea[name="message"]');
+        if (msgField) msgField.value = `Booking request for: ${e.target.dataset.title}`;
+      }
+      addMessage(`Booking form opened for: ${e.target.dataset.title}`, 'bot-message');
+    }
+  });
 
   // ===== Check URL hash on load =====
   if (window.location.hash) {
