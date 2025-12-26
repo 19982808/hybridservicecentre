@@ -10,7 +10,7 @@
       "Live data analysis",
       "System health report"
     ],
-    "image": "diagnostics.png"
+    "image": "services/diagnostics.png"
   },
   {
     "id": "battery-check",
@@ -23,7 +23,7 @@
       "Cooling fan & duct inspection",
       "Battery condition report"
     ],
-    "image": "images/services/battery.png"
+    "image": "services/battery.png"
   },
   {
     "id": "engine-transmission",
