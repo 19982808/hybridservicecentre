@@ -2,37 +2,79 @@
   {
     "id": "hybrid-diagnostics",
     "title": "Hybrid Diagnostics",
-    "description": "Advanced hybrid system scans and ECU diagnostics.",
-    "image": "services/diagnostics.png"
+    "shortDescription": "Advanced hybrid system scans and ECU diagnostics.",
+    "fullDescription": "Our hybrid diagnostics service uses manufacturer-grade diagnostic tools to scan hybrid control modules, ECUs, inverters, battery management systems, and regenerative braking components. We identify fault codes, performance inconsistencies, sensor failures, and communication errors between hybrid subsystems. This service is essential for early detection of hybrid issues, ensuring optimal performance, safety, and fuel efficiency.",
+    "includes": [
+      "Full hybrid ECU scan",
+      "Fault code interpretation",
+      "Live data analysis",
+      "System health report"
+    ],
+    "image": "images/services/diagnostics.png"
   },
   {
     "id": "battery-check",
     "title": "Battery Health Check",
-    "description": "High-voltage battery inspection and optimization.",
+    "shortDescription": "High-voltage battery inspection and optimization.",
+    "fullDescription": "Hybrid batteries degrade over time due to heat, charge cycles, and cell imbalance. Our battery health check evaluates voltage balance, internal resistance, cooling efficiency, and overall capacity. We detect weak cells early, helping extend battery lifespan and prevent sudden hybrid failure.",
+    "includes": [
+      "Battery voltage balancing check",
+      "Thermal performance inspection",
+      "Cooling fan & duct inspection",
+      "Battery condition report"
+    ],
     "image": "images/services/battery.png"
   },
   {
     "id": "engine-transmission",
     "title": "Engine & Transmission",
-    "description": "Minor and major engine services, CVT inspection.",
+    "shortDescription": "Engine servicing and hybrid transmission inspection.",
+    "fullDescription": "Hybrid engines and transmissions operate differently from conventional vehicles. We service Atkinson-cycle engines, inspect CVT and e-CVT systems, and ensure smooth integration between electric motors and internal combustion components. This service improves reliability, smooth acceleration, and fuel efficiency.",
+    "includes": [
+      "Hybrid engine service",
+      "CVT / e-CVT inspection",
+      "Fluid quality assessment",
+      "Performance optimization"
+    ],
     "image": "images/services/engine.png"
   },
   {
     "id": "brake-suspension",
     "title": "Brake & Suspension",
-    "description": "Regenerative brake maintenance and suspension care.",
+    "shortDescription": "Regenerative brake and suspension servicing.",
+    "fullDescription": "Hybrid vehicles rely heavily on regenerative braking, which reduces wear but introduces complex electronic control. We inspect brake actuators, pads, discs, suspension joints, and shock absorbers to ensure safety, comfort, and consistent braking response.",
+    "includes": [
+      "Regenerative brake system check",
+      "Brake pad & disc inspection",
+      "Suspension component inspection",
+      "Wheel alignment assessment"
+    ],
     "image": "images/services/brake.png"
   },
   {
     "id": "software-updates",
     "title": "Software Updates",
-    "description": "Hybrid software updates and ECU reprogramming.",
+    "shortDescription": "Hybrid ECU software updates and calibration.",
+    "fullDescription": "Manufacturers release software updates to improve efficiency, fix bugs, and enhance hybrid performance. We safely update hybrid ECUs, recalibrate systems, and reset learned parameters to ensure smooth operation and improved fuel economy.",
+    "includes": [
+      "ECU software updates",
+      "Hybrid system recalibration",
+      "Performance optimization",
+      "Error reset & validation"
+    ],
     "image": "images/services/software.png"
   },
   {
     "id": "general-maintenance",
     "title": "General Maintenance",
-    "description": "Aircon, tires, alignment, and bodywork services.",
+    "shortDescription": "Routine hybrid vehicle maintenance services.",
+    "fullDescription": "We provide complete general maintenance tailored for hybrid vehicles, including air conditioning servicing, tire services, wheel alignment, cooling system checks, and preventive inspections. Regular maintenance ensures longevity, reliability, and lower operating costs.",
+    "includes": [
+      "Air conditioning service",
+      "Tire rotation & balancing",
+      "Cooling system inspection",
+      "Preventive maintenance checks"
+    ],
     "image": "images/services/maintenance.png"
   }
 ]
