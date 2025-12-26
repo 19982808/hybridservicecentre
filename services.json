@@ -1,0 +1,38 @@
+[
+  {
+    "id": "hybrid-diagnostics",
+    "title": "Hybrid Diagnostics",
+    "description": "Advanced hybrid system scans and ECU diagnostics.",
+    "image": "images/services/diagnostics.png"
+  },
+  {
+    "id": "battery-check",
+    "title": "Battery Health Check",
+    "description": "High-voltage battery inspection and optimization.",
+    "image": "images/services/battery.png"
+  },
+  {
+    "id": "engine-transmission",
+    "title": "Engine & Transmission",
+    "description": "Minor and major engine services, CVT inspection.",
+    "image": "images/services/engine.png"
+  },
+  {
+    "id": "brake-suspension",
+    "title": "Brake & Suspension",
+    "description": "Regenerative brake maintenance and suspension care.",
+    "image": "images/services/brake.png"
+  },
+  {
+    "id": "software-updates",
+    "title": "Software Updates",
+    "description": "Hybrid software updates and ECU reprogramming.",
+    "image": "images/services/software.png"
+  },
+  {
+    "id": "general-maintenance",
+    "title": "General Maintenance",
+    "description": "Aircon, tires, alignment, and bodywork services.",
+    "image": "images/services/maintenance.png"
+  }
+]
