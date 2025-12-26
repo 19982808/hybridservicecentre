@@ -112,8 +112,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 // ================= LOAD SERVICE CARDS =================
-const serviceContainer = document.querySelector('.service-grid');
-if (serviceContainer) {
+document.addEventListener('DOMContentLoaded', () => {
+  const serviceGrid = document.querySelector('.service-grid');
+  const serviceDetail = document.getElementById('service-detail');
+  const bookingForm = document.getElementById('bookingForm');
+
+  // Load services
   fetch('services.json')
     .then(res => res.json())
     .then(data => {
@@ -121,18 +125,57 @@ if (serviceContainer) {
         const card = document.createElement('div');
         card.className = 'service-card';
         card.innerHTML = `
-          <i class="${service.icon}" style="font-size:40px;color:#1E3A5F;margin-bottom:10px;"></i>
+          <img src="${service.image}" alt="${service.title}" style="width:100px; height:100px; object-fit:contain;">
           <h3>${service.title}</h3>
           <p>${service.description}</p>
-          <button class="service-btn" data-id="${service.id}">Read More</button>
+          <button class="read-more-btn" data-id="${service.id}">Read More</button>
+          <button class="book-now-btn" data-title="${service.title}">Book Now</button>
         `;
-        serviceContainer.appendChild(card);
+        serviceGrid.appendChild(card);
       });
 
-      // Add click event for "Read More" buttons
-      document.querySelectorAll('.service-btn').forEach(btn => {
-        btn.addEventListener('click', () => openServicePage(btn.dataset.id));
+      // Read More click
+      document.querySelectorAll('.read-more-btn').forEach(btn => {
+        btn.addEventListener('click', () => openServicePage(btn.dataset.id, data));
       });
-    })
-    .catch(err => console.error("Error loading services.json:", err));
-}
+
+      // Book Now click
+      document.querySelectorAll('.book-now-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          showPage('booking');
+          if (bookingForm) {
+            const msgField = bookingForm.querySelector('textarea[name="message"]');
+            if (msgField) msgField.value = `Booking request for: ${btn.dataset.title}`;
+          }
+        });
+      });
+    });
+
+  // Open service detail
+  function openServicePage(id, services) {
+    const service = services.find(s => s.id === id);
+    if (service && serviceDetail) {
+      serviceDetail.innerHTML = `
+        <h2>${service.title}</h2>
+        <img src="${service.image}" alt="${service.title}" style="max-width:100%;margin:20px 0;">
+        <p>${service.description}</p>
+        <button id="back-to-services">Back to Services</button>
+      `;
+      showPage('service-detail');
+
+      document.getElementById('back-to-services').addEventListener('click', () => {
+        showPage('services');
+      });
+    }
+  }
+
+  // SPA page switching
+  function showPage(pageId) {
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(pageId);
+    if (target) target.classList.add('active');
+    window.scrollTo(0, 0);
+    history.replaceState(null, '', `#${pageId}`);
+  }
+});
