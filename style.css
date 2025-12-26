@@ -193,6 +193,33 @@ section {
   color: #F1C40F;
   transform: translateY(-5px);
 }
+#service-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+}
+#service-modal.active {
+  display: flex;
+}
+#modal-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 600px;
+  width: 90%;
+  position: relative;
+}
+#modal-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  cursor: pointer;
+  font-size: 24px;
+}
 
 /* ==================== Booking ==================== */
 #bookingForm {
