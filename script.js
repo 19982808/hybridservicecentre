@@ -134,3 +134,80 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 });
+// ================================
+// SERVICES SECTION SCRIPT
+// ================================
+
+const servicesContainer = document.getElementById("services-container");
+const serviceModal = document.getElementById("service-modal");
+const modalContent = document.getElementById("modal-content");
+const modalClose = document.getElementById("modal-close");
+
+// Fetch services data
+fetch("services.json")
+  .then(res => res.json())
+  .then(services => renderServices(services))
+  .catch(err => console.error("Service load error:", err));
+
+// Render service cards
+function renderServices(services) {
+  servicesContainer.innerHTML = "";
+
+  services.forEach(service => {
+    const card = document.createElement("div");
+    card.className = "service-card";
+
+    card.innerHTML = `
+      <img src="${service.image}" alt="${service.title}">
+      <h3>${service.title}</h3>
+      <p>${service.shortDescription}</p>
+      <button class="read-more" data-id="${service.id}">Read More</button>
+    `;
+
+    servicesContainer.appendChild(card);
+  });
+
+  attachReadMoreEvents(services);
+}
+
+// Read More button logic
+function attachReadMoreEvents(services) {
+  document.querySelectorAll(".read-more").forEach(button => {
+    button.addEventListener("click", () => {
+      const serviceId = button.dataset.id;
+      const service = services.find(s => s.id === serviceId);
+      openModal(service);
+    });
+  });
+}
+
+// Open modal
+function openModal(service) {
+  modalContent.innerHTML = `
+    <h2>${service.title}</h2>
+    <p>${service.fullDescription}</p>
+
+    <h4>What This Service Includes:</h4>
+    <ul>
+      ${service.includes.map(item => `<li>${item}</li>`).join("")}
+    </ul>
+
+    <button class="back-btn">Back to Services</button>
+  `;
+
+  serviceModal.classList.add("active");
+
+  document.querySelector(".back-btn").addEventListener("click", closeModal);
+}
+
+// Close modal
+function closeModal() {
+  serviceModal.classList.remove("active");
+}
+
+// Close when clicking X or outside
+modalClose.addEventListener("click", closeModal);
+serviceModal.addEventListener("click", e => {
+  if (e.target === serviceModal) closeModal();
+});
+
