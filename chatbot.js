@@ -8,11 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const options = document.querySelectorAll('#chatbot-options button');
   const bookingForm = document.getElementById('bookingForm');
 
-  // ===== Toggle chatbot =====
+  /* ===== Toggle chatbot ===== */
   toggle.addEventListener('click', () => container.style.display = 'flex');
   closeBtn.addEventListener('click', () => container.style.display = 'none');
 
-  // ===== Send message =====
+  /* ===== Send message ===== */
   function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
@@ -21,10 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
     messages.scrollTop = messages.scrollHeight;
     setTimeout(() => processMessage(text.toLowerCase()), 400);
   }
-  sendBtn.addEventListener('click', sendMessage);
-  input.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
 
-  // ===== Option buttons =====
+  sendBtn.addEventListener('click', sendMessage);
+  input.addEventListener('keypress', e => {
+    if (e.key === 'Enter') sendMessage();
+  });
+
+  /* ===== Option buttons ===== */
   options.forEach(btn => {
     btn.addEventListener('click', () => {
       const option = btn.dataset.option;
@@ -37,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ===== Add message to chat =====
+  /* ===== Add message ===== */
   function addMessage(text, className, html = false) {
     const div = document.createElement('div');
     div.className = className;
@@ -47,90 +50,88 @@ document.addEventListener('DOMContentLoaded', () => {
     messages.scrollTop = messages.scrollHeight;
   }
 
-  // ===== SPA page switching =====
-  window.showPage = function(pageId) {
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(p => p.classList.remove('active'));
-    const target = document.getElementById(pageId);
-    if (target) target.classList.add('active');
-    window.scrollTo(0, 0);
-    history.replaceState(null, '', `#${pageId}`);
-  }
-
-  // ===== Process user input =====
+  /* ===== Process user input ===== */
   function processMessage(text) {
-    if (text.includes('service') || text.includes('services')) {
+    if (text.includes('service')) {
       fetch('services.json')
         .then(res => res.json())
         .then(data => {
-          if (!data.length) return addMessage('No services available.', 'bot-message');
+          if (!data.length) {
+            addMessage('No services available.', 'bot-message');
+            return;
+          }
 
-          addMessage('Here are our main services:', 'bot-message');
+          addMessage('Here are our services:', 'bot-message');
 
           data.forEach(service => {
             const content = `
-              <div style="border:1px solid #ccc; padding:8px; margin:5px 0; border-radius:8px; overflow:hidden;">
-                <img src="${service.image}" alt="${service.title}" style="width:80px; height:80px; object-fit:contain; float:left; margin-right:10px;">
+              <div style="border:1px solid #ccc; padding:8px; margin:6px 0; border-radius:8px;">
+                <img src="${service.image}" style="width:70px;height:70px;float:left;margin-right:10px;">
                 <strong>${service.title}</strong><br>
                 <small>${service.shortDescription}</small><br>
                 <button class="service-chat-btn" data-id="${service.id}">Read More</button>
                 <button class="book-service-btn" data-title="${service.title}">Book Now</button>
-                <div style="clear:both;"></div>
+                <div style="clear:both"></div>
               </div>
             `;
             addMessage(content, 'bot-message', true);
           });
         });
+
     } else if (text.includes('book')) {
       showPage('booking');
-      addMessage('Booking form is now open. Please fill in your details.', 'bot-message');
+      addMessage('Booking form opened.', 'bot-message');
+
     } else if (text.includes('location')) {
       showPage('location');
-      addMessage('Our main branch is in Nairobi, Kenya. Check the map above.', 'bot-message');
+      addMessage('Our location is shown on the map.', 'bot-message');
+
     } else if (text.includes('contact')) {
       showPage('contact');
-      addMessage('You can call 0712328599, email info@hybridservice.com, or click WhatsApp to chat.', 'bot-message');
+      addMessage('Call 0712328599 or email info@hybridservice.com.', 'bot-message');
+
     } else {
-      addMessage('I did not understand. Type "services", "book", "location", or click WhatsApp.', 'bot-message');
+      addMessage('Try typing: services, book, location, or contact.', 'bot-message');
     }
   }
 
-  // ===== Event delegation for dynamic buttons inside chatbot =====
+  /* ===== Event delegation inside chatbot ===== */
   messages.addEventListener('click', e => {
-    // Read More
+
+    /* READ MORE */
     if (e.target.classList.contains('service-chat-btn')) {
       const id = e.target.dataset.id;
+
       fetch('services.json')
         .then(res => res.json())
         .then(data => {
           const service = data.find(s => s.id === id);
           if (!service) return;
 
-          const serviceDetail = document.getElementById('service-detail');
-          serviceDetail.querySelector('.container').innerHTML = `
+          const detail = document.getElementById('service-detail');
+          detail.querySelector('.container').innerHTML = `
             <h2>${service.title}</h2>
-            <img src="${service.image}" alt="${service.title}" style="max-width:100%; margin:20px 0;">
+            <img src="${service.image}" style="max-width:100%;margin:20px 0;">
             <p>${service.fullDescription}</p>
-            <button onclick="showPage('services')">Back to Services</button>
+            <button onclick="showPage('our-services')">Back to Our Services</button>
           `;
+
           showPage('service-detail');
         });
     }
 
-    // Book Now
+    /* BOOK NOW */
     if (e.target.classList.contains('book-service-btn')) {
       showPage('booking');
+
       if (bookingForm) {
-        const msgField = bookingForm.querySelector('textarea[name="message"]');
-        if (msgField) msgField.value = `Booking request for: ${e.target.dataset.title}`;
+        const msg = bookingForm.querySelector('textarea[name="message"]');
+        if (msg) msg.value = `Booking request for: ${e.target.dataset.title}`;
       }
-      addMessage(`Booking form opened for: ${e.target.dataset.title}`, 'bot-message');
+
+      addMessage(`Booking form opened for ${e.target.dataset.title}`, 'bot-message');
     }
   });
 
-  // ===== Check URL hash on load =====
-  if (window.location.hash) {
-    const hash = window.location.hash.replace('#', '');
-    showPage(hash);
-  }
 });
+ 
