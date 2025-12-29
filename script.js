@@ -85,56 +85,55 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
 
-  /* ================= SERVICES ================= */
-  const serviceGrid = document.querySelector('.service-grid');
-  const serviceDetail = document.getElementById('service-detail');
-  let servicesCache = [];
+ 
+  /* ================= OUR SERVICES ================= */
+const serviceGrid = document.querySelector('.service-grid');
+const serviceDetail = document.getElementById('service-detail');
+let servicesCache = [];
 
-  if (serviceGrid) {
-    fetch('services.json')
-      .then(res => res.json())
-      .then(data => {
-        servicesCache = data;
-        serviceGrid.innerHTML = '';
+if (serviceGrid) {
+  fetch('services.json')
+    .then(res => res.json())
+    .then(data => {
+      servicesCache = data;
+      serviceGrid.innerHTML = '';
 
-        data.forEach(service => {
-          const card = document.createElement('div');
-          card.className = 'service-card';
-          card.innerHTML = `
-            <img src="${service.image}" alt="${service.title}" style="width:100px;height:100px;object-fit:contain;">
-            <h3>${service.title}</h3>
-            <p>${service.shortDescription}</p>
-            <button class="read-more-btn" data-id="${service.id}">Read More</button>
-          `;
-          serviceGrid.appendChild(card);
-        });
+      data.forEach(service => {
+        const card = document.createElement('div');
+        card.className = 'service-card';
+        card.innerHTML = `
+          <img src="${service.image}" alt="${service.title}" style="width:100px;height:100px;object-fit:contain;">
+          <h3>${service.title}</h3>
+          <p>${service.shortDescription}</p>
+          <button class="read-more-btn" data-id="${service.id}">Read More</button>
+        `;
+        serviceGrid.appendChild(card);
+      });
 
-        document.querySelectorAll('.read-more-btn').forEach(btn => {
-          btn.addEventListener('click', () => openServicePage(btn.dataset.id));
-        });
-      })
-      .catch(err => console.error('Service error:', err));
-  }
+      document.querySelectorAll('.read-more-btn').forEach(btn => {
+        btn.addEventListener('click', () => openServicePage(btn.dataset.id));
+      });
+    })
+    .catch(err => console.error('Service error:', err));
+}
 
-  function openServicePage(id) {
-    const service = servicesCache.find(s => s.id === id);
-    if (!service || !serviceDetail) return;
+function openServicePage(id) {
+  const service = servicesCache.find(s => s.id === id);
+  if (!service || !serviceDetail) return;
 
-    serviceDetail.innerHTML = `
-      <h2>${service.title}</h2>
-      <img src="${service.image}" alt="${service.title}" style="max-width:100%;margin:20px 0;">
-      <p>${service.fullDescription}</p>
-      <h4>What This Service Includes:</h4>
-      <ul>
-        ${service.includes.map(item => `<li>${item}</li>`).join('')}
-      </ul>
-      <button id="back-to-services">Back to Services</button>
-    `;
+  serviceDetail.innerHTML = `
+    <h2>${service.title}</h2>
+    <img src="${service.image}" alt="${service.title}" style="max-width:100%;margin:20px 0;">
+    <p>${service.fullDescription}</p>
+    <h4>What This Service Includes:</h4>
+    <ul>
+      ${service.includes.map(item => `<li>${item}</li>`).join('')}
+    </ul>
+    <button id="back-to-services">Back to Our Services</button>
+  `;
 
-    showPage('service-detail');
+  showPage('service-detail');
 
-    document.getElementById('back-to-services')
-      .addEventListener('click', () => showPage('services'));
-  }
-
-});
+  document.getElementById('back-to-services')
+    .addEventListener('click', () => showPage('our-services'));
+}
