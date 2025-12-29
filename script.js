@@ -19,11 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Load page from hash
+  // Load page from URL hash
   const hash = window.location.hash.replace('#', '');
   if (hash && document.getElementById(hash)) showPage(hash);
   else showPage('home');
-
 
   /* ================= HERO SLIDESHOW ================= */
   const slides = document.querySelectorAll('.slide');
@@ -53,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 5000);
   }
 
-
   /* ================= BOOKING FORM ================= */
   const bookingForm = document.getElementById('bookingForm');
   if (bookingForm) {
@@ -76,22 +74,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-
-  /* ================= MPESA COPY ================= */
-  window.copyText = text => {
-    navigator.clipboard.writeText(text)
-      .then(() => alert('Copied: ' + text))
-      .catch(() => alert('Copy failed'));
-  };
-
-
   /* ================= OUR SERVICES ================= */
   const serviceGrid = document.querySelector('.service-grid');
   const serviceDetail = document.getElementById('service-detail');
   let servicesCache = [];
 
   if (serviceGrid) {
-    fetch('services.json')
+    fetch('services.json') // Ensure services.json is in the same folder
       .then(res => res.json())
       .then(data => {
         servicesCache = data;
@@ -113,14 +102,14 @@ document.addEventListener('DOMContentLoaded', () => {
           btn.addEventListener('click', () => openServicePage(btn.dataset.id));
         });
       })
-      .catch(err => console.error('Service error:', err));
+      .catch(err => console.error('Service loading error:', err));
   }
 
   function openServicePage(id) {
     const service = servicesCache.find(s => s.id === id);
     if (!service || !serviceDetail) return;
 
-    serviceDetail.querySelector('.container').innerHTML = `
+    serviceDetail.innerHTML = `
       <h2>${service.title}</h2>
       <img src="${service.image}" alt="${service.title}" style="max-width:100%;margin:20px 0;">
       <p>${service.fullDescription}</p>
@@ -135,12 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('back-to-services')
       .addEventListener('click', () => showPage('our-services'));
-  }
-
-  // Load page from hash on reload
-  if (window.location.hash) {
-    const hash = window.location.hash.replace('#', '');
-    showPage(hash);
   }
 
 });
