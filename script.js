@@ -1,16 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* ================= SPA NAVIGATION + HASH SUPPORT ================= */
-  const navLinks = document.querySelectorAll('[data-page]');
+  // ================= SPA PAGE SWITCHING (GLOBAL) =================
+window.showPage = function(pageId) {
   const pages = document.querySelectorAll('.page');
+  pages.forEach(p => p.classList.remove('active'));
+  const target = document.getElementById(pageId);
+  if (target) target.classList.add('active');
+  window.scrollTo(0, 0);
+  history.replaceState(null, '', `#${pageId}`);
+}
 
-  function showPage(pageId) {
-    pages.forEach(page => page.classList.remove('active'));
-    const target = document.getElementById(pageId);
-    if (target) target.classList.add('active');
-    window.scrollTo(0, 0);
-    history.replaceState(null, '', `#${pageId}`);
-  }
 
   navLinks.forEach(link => {
     link.addEventListener('click', e => {
