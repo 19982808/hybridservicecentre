@@ -141,10 +141,12 @@ document.addEventListener('DOMContentLoaded', () => {
       addMessage(`Booking form opened for ${e.target.dataset.title}`, 'bot-message');
     }
 
-    // Back to Our Services
-    if (e.target.classList.contains('back-services-btn')) {
-      window.showPage('our-services');
-    }
-  });
-
+    /// Delegated click inside chatbot messages
+messages.addEventListener('click', e => {
+  // Back to Our Services button
+  if (e.target.classList.contains('back-services-btn')) {
+    window.showPage('our-services'); // make sure your "our-services" section has id="our-services"
+  }
 });
+
+   
