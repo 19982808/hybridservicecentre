@@ -1,105 +1,148 @@
-// chatbot.js
+document.addEventListener('DOMContentLoaded', () => {
+  const toggle = document.getElementById('chatbot-toggle');
+  const container = document.getElementById('chatbot-container');
+  const closeBtn = document.getElementById('chatbot-close');
+  const sendBtn = document.getElementById('chatbot-send');
+  const input = document.getElementById('chatbot-input');
+  const messages = document.getElementById('chatbot-messages');
+  const options = document.querySelectorAll('#chatbot-options button');
+  const bookingForm = document.getElementById('bookingForm');
 
-async function createChatbot() {
-    const chatbotToggle = document.getElementById('chatbot-toggle');
-    const chatbotContainer = document.getElementById('chatbot-container');
-    const chatbotClose = document.getElementById('chatbot-close');
-    const chatbotMessages = document.getElementById('chatbot-messages');
-    const chatbotInput = document.getElementById('chatbot-input');
-    const chatbotSend = document.getElementById('chatbot-send');
+  // ===== Toggle chatbot =====
+  toggle.addEventListener('click', () => container.style.display = 'flex');
+  closeBtn.addEventListener('click', () => container.style.display = 'none');
 
-    // Show the chatbot when the toggle is clicked
-    chatbotToggle.addEventListener('click', () => {
-        chatbotContainer.style.display = 'flex';
+  // ===== Send message =====
+  function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+    addMessage(text, 'user-message');
+    input.value = '';
+    messages.scrollTop = messages.scrollHeight;
+
+    setTimeout(() => processMessage(text.toLowerCase()), 400);
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+  input.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+
+  // ===== Option buttons =====
+  options.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const option = btn.dataset.option;
+      if (btn.id === 'whatsapp-chat') {
+        window.open('https://wa.me/254712328599', '_blank');
+      } else {
+        input.value = option;
+        sendMessage();
+      }
     });
+  });
 
-    // Close the chatbot when the close button is clicked
-    chatbotClose.addEventListener('click', () => {
-        chatbotContainer.style.display = 'none';
-    });
+  // ===== Add message to chat =====
+  function addMessage(text, className, html = false) {
+    const div = document.createElement('div');
+    div.className = className;
+    if (html) div.innerHTML = text;
+    else div.textContent = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  }
 
-    // Function to add a message to the chatbot
-    function addMessage(msg, isUser = false) {
-        const div = document.createElement('div');
-        div.textContent = msg;
-        div.style.marginBottom = '0.5rem';
-        div.style.textAlign = isUser ? 'right' : 'left';
-        chatbotMessages.appendChild(div);
-        chatbotMessages.scrollTop = chatbotMessages.scrollHeight; // Scroll to the bottom
+  // ===== SPA page switching =====
+  function showPage(pageId) {
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(pageId);
+    if (target) target.classList.add('active');
+    window.scrollTo(0, 0);
+    history.replaceState(null, '', `#${pageId}`);
+  }
+
+  // ===== Process user input =====
+  function processMessage(text) {
+    if (text.includes('service') || text.includes('services')) {
+      fetch('services.json')
+        .then(res => res.json())
+        .then(data => {
+          if (!data.length) return addMessage('No services available.', 'bot-message');
+
+          addMessage('Here are our main services:', 'bot-message');
+
+          data.forEach(service => {
+            const content = `
+              <div style="border:1px solid #ccc; padding:8px; margin:5px 0; border-radius:8px;">
+                <img src="${service.image}" alt="${service.title}" style="width:80px; height:80px; object-fit:contain; float:left; margin-right:10px;">
+                <strong>${service.title}</strong><br>
+                <small>${service.description}</small><br>
+                <button class="service-chat-btn" data-id="${service.id}">Read More</button>
+                <button class="book-service-btn" data-title="${service.title}">Book Now</button>
+                <div style="clear:both;"></div>
+              </div>
+            `;
+            addMessage(content, 'bot-message', true);
+          });
+
+          document.querySelectorAll('.service-chat-btn').forEach(btn => {
+            btn.addEventListener('click', () => openServicePage(btn.dataset.id));
+          });
+
+          document.querySelectorAll('.book-service-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              showPage('booking');
+              if (bookingForm) {
+                const msgField = bookingForm.querySelector('textarea[name="message"]');
+                if (msgField) msgField.value = `Booking request for: ${btn.dataset.title}`;
+              }
+              addMessage(`Booking form opened for: ${btn.dataset.title}`, 'bot-message');
+            });
+          });
+        });
+    } else if (text.includes('book')) {
+      showPage('booking');
+      addMessage('Booking form is now open. Please fill in your details.', 'bot-message');
+    } else if (text.includes('location')) {
+      showPage('location');
+      addMessage('Our main branch is in Nairobi, Kenya. Check the map above.', 'bot-message');
+    } else if (text.includes('contact')) {
+      showPage('contact');
+      addMessage('You can call 0712328599, email info@hybridservice.com, or click WhatsApp to chat.', 'bot-message');
+    } else {
+      addMessage('I did not understand. Type "services", "book", "location", or click WhatsApp.', 'bot-message');
     }
+  }
 
-    // Function to create a button
-    function addButton(label, callback) {
-        const button = document.createElement('button');
-        button.textContent = label;
-        button.style.marginTop = '0.5rem';
-        button.style.cursor = 'pointer';
-        button.onclick = callback;
-        return button;
-    }
+  // ===== Open service detail page from chat =====
+  function openServicePage(id) {
+    fetch('services.json')
+      .then(res => res.json())
+      .then(data => {
+        const service = data.find(s => s.id === id);
+        if (service) {
+          let serviceDetail = document.getElementById('service-detail');
+          if (!serviceDetail) {
+            serviceDetail = document.createElement('section');
+            serviceDetail.id = 'service-detail';
+            serviceDetail.className = 'page';
+            document.body.appendChild(serviceDetail);
+          }
 
-    // Send message when the send button is clicked
-    chatbotSend.addEventListener('click', async () => {
-        const msg = chatbotInput.value.trim();
-        if (!msg) return;
-        addMessage(msg, true); // Add user's message
-        chatbotInput.value = ''; // Clear input
-        await respond(msg.toLowerCase()); // Process the user's message
-    });
-
-    // Send message when Enter key is pressed
-    chatbotInput.addEventListener('keypress', e => {
-        if (e.key === 'Enter') chatbotSend.click();
-    });
-
-    // Respond to user messages
-    async function respond(msg) {
-        if (msg.includes('service') || msg.includes('services')) {
-            addMessage('You can view our services here:');
-            const services = await fetchServices();
-            services.forEach(service => {
-                const readMoreButton = addButton(`Read More about ${service.title}`, () => {
-                    showServiceDetail(service);
-                });
-                chatbotMessages.appendChild(readMoreButton);
-            });
-        } else if (msg.includes('book')) {
-            addMessage('Would you like to book a service?');
-            const bookButton = addButton('Book Now', () => {
-                document.getElementById('booking-form').style.display = 'block'; // Show booking form
-                chatbotContainer.style.display = 'none'; // Close chatbot
-            });
-            chatbotMessages.appendChild(bookButton);
-        } else if (msg.includes('location')) {
-            addMessage('We are located at Naivasha Road, Dagoretti Corner next to Shell petrol station.');
-            addMessage('Opening the map...');
-            // Open Google Maps with the specified location
-            window.open('https://www.google.com/maps?q=Naivasha+Road,+Dagoretti+Corner', '_blank');
-        } else if (msg.includes('whatsapp') || msg.includes('wa me')) {
-            addMessage('You can chat with us on WhatsApp!');
-            const whatsappButton = addButton('WhatsApp Me', () => {
-                const message = encodeURIComponent("Hello! I would like to inquire about your services.");
-                const phoneNumber = '254712328599'; // Replace with your WhatsApp number
-                window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
-            });
-            chatbotMessages.appendChild(whatsappButton);
-        } else {
-            addMessage("I'm here to help! You can ask about our services, booking, location, or contact us on WhatsApp.");
+          serviceDetail.innerHTML = `
+            <div class="container">
+              <h2>${service.title}</h2>
+              <img src="${service.image}" alt="${service.title}" style="max-width:100%; margin:20px 0;">
+              <p>${service.description}</p>
+              <button onclick="showPage('services')">Back to Services</button>
+            </div>
+          `;
+          showPage('service-detail');
         }
-    }
+      });
+  }
 
-    // Fetch services from the JSON file
-    async function fetchServices() {
-        const res = await fetch('services.json');
-        return await res.json();
-    }
-
-    // Show detailed information about a service
-    function showServiceDetail(service) {
-        addMessage(`**${service.title}**: ${service.fullDescription}`);
-        addMessage(`Includes: ${service.includes.join(', ')}`);
-    }
-}
-
-// Call the chatbot function to initialize
-createChatbot();
+  // ===== Check URL hash on load =====
+  if (window.location.hash) {
+    const hash = window.location.hash.replace('#', '');
+    showPage(hash);
+  }
+});
