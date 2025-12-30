@@ -23,44 +23,60 @@ document.addEventListener('DOMContentLoaded', () => {
   if (hash && document.getElementById(hash)) showPage(hash);
   else showPage('home');
 
+  /* ================= NAVBAR SCROLL EFFECT ================= */
+  const header = document.querySelector('.site-header');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
   /* ================= HERO SLIDESHOW ================= */
   const slides = document.querySelectorAll('.slide');
   const dotsContainer = document.querySelector('.dots');
   let currentSlide = 0;
+  let slideInterval;
+
+  function showSlide(index) {
+    slides.forEach(s => s.classList.remove('active'));
+    const dots = document.querySelectorAll('.dot');
+    dots.forEach(d => d.classList.remove('active'));
+    slides[index].classList.add('active');
+    dots[index].classList.add('active');
+    currentSlide = index;
+  }
+
+  function startSlideShow() {
+    slideInterval = setInterval(() => {
+      showSlide((currentSlide + 1) % slides.length);
+    }, 5000);
+  }
+
+  function stopSlideShow() {
+    clearInterval(slideInterval);
+  }
 
   if (slides.length && dotsContainer) {
     slides.forEach((_, i) => {
       const dot = document.createElement('span');
       dot.className = 'dot' + (i === 0 ? ' active' : '');
-      dot.addEventListener('click', () => showSlide(i));
+      dot.addEventListener('click', () => {
+        showSlide(i);
+        stopSlideShow();
+        startSlideShow();
+      });
       dotsContainer.appendChild(dot);
     });
 
-    const dots = document.querySelectorAll('.dot');
+    const heroContainer = document.querySelector('.hero');
+    heroContainer.addEventListener('mouseenter', stopSlideShow);
+    heroContainer.addEventListener('mouseleave', startSlideShow);
 
-    function showSlide(index) {
-      slides.forEach(s => s.classList.remove('active'));
-      dots.forEach(d => d.classList.remove('active'));
-      slides[index].classList.add('active');
-      dots[index].classList.add('active');
-      currentSlide = index;
-    }
-
-    // Auto slide with fade + zoom cinematic effect
-    setInterval(() => {
-      showSlide((currentSlide + 1) % slides.length);
-    }, 5000);
+    showSlide(0);
+    startSlideShow();
   }
-
-  /* ================= NAVBAR SCROLL EFFECT ================= */
-  const siteHeader = document.querySelector('.site-header');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-      siteHeader.classList.add('scrolled');
-    } else {
-      siteHeader.classList.remove('scrolled');
-    }
-  });
 
   /* ================= BOOKING FORM ================= */
   const bookingForm = document.getElementById('bookingForm');
@@ -95,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(data => {
         servicesCache = data;
         serviceGrid.innerHTML = '';
+
         data.forEach(service => {
           const card = document.createElement('div');
           card.className = 'service-card';
@@ -133,6 +150,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('back-to-services')
       .addEventListener('click', () => showPage('our-services'));
+  }
+
+  /* ================= CHATBOT ================= */
+  const chatbotToggle = document.getElementById('chatbot-toggle');
+  const chatbotContainer = document.getElementById('chatbot-container');
+
+  if (chatbotToggle && chatbotContainer) {
+    chatbotToggle.addEventListener('click', () => {
+      chatbotContainer.style.display = chatbotContainer.style.display === 'flex' ? 'none' : 'flex';
+    });
   }
 
 });
