@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
           }
 
-          servicesCache = data; // store for later use
+          servicesCache = data; // store for later
           addMessage('Here are our services:', 'bot-message');
 
           data.forEach(service => {
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
       addMessage('Booking form opened.', 'bot-message');
 
     } else if (text.includes('location')) {
-      showPage('contact'); // assuming location is in contact page
+      showPage('contact');
       addMessage('Our location: Naivasha road, Dagoretti Corner next to Shell petrol station.', 'bot-message');
 
     } else if (text.includes('contact')) {
@@ -98,13 +98,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /* ===== Event delegation inside chatbot ===== */
-  messages.addEventListener('click', e => {
+  /* ===== Event delegation for dynamic buttons ===== */
+  document.body.addEventListener('click', e => {
 
     // READ MORE
     if (e.target.classList.contains('service-chat-btn')) {
       const id = e.target.dataset.id;
-      openServicePage(id);
+      const service = servicesCache.find(s => s.id === id);
+      if (!service || !serviceDetail) return;
+
+      serviceDetail.innerHTML = `
+        <h2>${service.title}</h2>
+        <img src="${service.image}" alt="${service.title}" style="max-width:100%;margin:20px 0;">
+        <p>${service.fullDescription}</p>
+        <h4>What This Service Includes:</h4>
+        <ul>
+          ${service.includes.map(item => `<li>${item}</li>`).join('')}
+        </ul>
+        <button class="back-to-services">Back to Our Services</button>
+      `;
+      showPage('service-detail');
     }
 
     // BOOK NOW
@@ -116,32 +129,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       addMessage(`Booking form opened for ${e.target.dataset.title}`, 'bot-message');
     }
+
+    // BACK TO OUR SERVICES
+    if (e.target.classList.contains('back-to-services')) {
+      showPage('our-services');
+    }
   });
 
-  /* ===== Open service page with back button ===== */
-  function openServicePage(id) {
-    const service = servicesCache.find(s => s.id === id);
-    if (!service || !serviceDetail) return;
-
-    serviceDetail.innerHTML = `
-      <h2>${service.title}</h2>
-      <img src="${service.image}" alt="${service.title}" style="max-width:100%;margin:20px 0;">
-      <p>${service.fullDescription}</p>
-      <h4>What This Service Includes:</h4>
-      <ul>
-        ${service.includes.map(item => `<li>${item}</li>`).join('')}
-      </ul>
-      <button id="back-to-services">Back to Our Services</button>
-    `;
-
-    showPage('service-detail');
-
-    // Attach event listener for Back button
-    const backBtn = document.getElementById('back-to-services');
-    if (backBtn) {
-      backBtn.addEventListener('click', () => showPage('our-services'));
-    }
-  }
-
 });
-
