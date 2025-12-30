@@ -5,13 +5,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendBtn = document.getElementById('chatbot-send');
     const input = document.getElementById('chatbot-input');
     const messages = document.getElementById('chatbot-messages');
-    const options = document.querySelectorAll('#chatbot-options button');
 
-    /* ===== Toggle chatbot ===== */
+    // Toggle chatbot visibility
     toggle.addEventListener('click', () => container.style.display = 'flex');
     closeBtn.addEventListener('click', () => container.style.display = 'none');
 
-    /* ===== Send message ===== */
+    // Send message
     function sendMessage() {
         const text = input.value.trim();
         if (!text) return;
@@ -26,19 +25,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') sendMessage();
     });
 
-    /* ===== Add message ===== */
-    function addMessage(text, className, html = false) {
+    // Add message to chat
+    function addMessage(text, className) {
         const div = document.createElement('div');
         div.className = className;
-        if (html) div.innerHTML = text;
-        else div.textContent = text;
+        div.textContent = text;
         messages.appendChild(div);
         messages.scrollTop = messages.scrollHeight;
     }
 
-    /* ===== Process user input ===== */
+    // Process user input
     function processMessage(text) {
         if (text.includes('service')) {
+            // Fetch services from services.json
             fetch('services.json')
                 .then(res => res.json())
                 .then(data => {
@@ -48,90 +47,47 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     addMessage('Here are our services:', 'bot-message');
-
                     data.forEach(service => {
                         const content = `
-                            <div style="border:1px solid #ccc; padding:8px; margin:6px 0; border-radius:8px;">
-                                <img src="${service.image}" style="width:70px;height:70px;float:left;margin-right:10px;">
+                            <div>
                                 <strong>${service.title}</strong><br>
                                 <small>${service.shortDescription}</small><br>
                                 <button class="service-chat-btn" data-id="${service.id}">Read More</button>
                                 <button class="book-service-btn" data-title="${service.title}">Book Now</button>
-                                <div style="clear:both"></div>
                             </div>
                         `;
-                        addMessage(content, 'bot-message', true);
+                        addMessage(content, 'bot-message');
                     });
                 });
         } else if (text.includes('book')) {
-            showPage('booking');
             addMessage('Booking form opened.', 'bot-message');
         } else if (text.includes('location')) {
-            addMessage('Our location is:', 'bot-message');
-            addMessage('<a href="https://www.google.com/maps/place/Nairobi,+Kenya" target="_blank">Click here to view on Google Maps</a>', 'bot-message', true);
-        } else if (text.includes('contact')) {
-            addMessage('Call 0712328599 or email info@hybridservice.com.', 'bot-message');
+            addMessage('Our location is: <a href="https://www.google.com/maps/place/Nairobi,+Kenya" target="_blank">Click here to view on Google Maps</a>', 'bot-message', true);
         } else {
             addMessage('Try typing: services, book, location, or contact.', 'bot-message');
         }
     }
 
-    /* ===== Event delegation inside chatbot ===== */
+    // Event delegation for service buttons
     messages.addEventListener('click', e => {
-        /* READ MORE */
         if (e.target.classList.contains('service-chat-btn')) {
             const id = e.target.dataset.id;
-
             fetch('services.json')
                 .then(res => res.json())
                 .then(data => {
                     const service = data.find(s => s.id === id);
                     if (!service) return;
-
-                    const detail = document.getElementById('service-detail');
-                    detail.querySelector('.container').innerHTML = `
-                        <h2>${service.title}</h2>
-                        <img src="${service.image}" style="max-width:100%;margin:20px 0;">
-                        <p>${service.fullDescription}</p>
-                    `;
-
-                    detail.style.display = 'block'; // Show service detail
-                    container.style.display = 'none'; // Hide chatbot
+                    addMessage(`Service Details: ${service.fullDescription}`, 'bot-message');
                 });
         }
 
-        /* BOOK NOW */
         if (e.target.classList.contains('book-service-btn')) {
-            showPage('booking');
             const serviceName = e.target.dataset.title;
-            document.getElementById('service').value = serviceName; // Set the service name in the booking form
             addMessage(`Booking form opened for ${serviceName}.`, 'bot-message');
         }
     });
 
-    /* Show specific page */
-    function showPage(page) {
-        if (page === 'booking') {
-            document.getElementById('bookingForm').reset(); // Reset the form
-            document.getElementById('booking').style.display = 'block';
-            container.style.display = 'none';
-            document.getElementById('service-detail').style.display = 'none';
-        } else if (page === 'chatbot-container') {
-            container.style.display = 'flex';
-            document.getElementById('booking').style.display = 'none';
-            document.getElementById('service-detail').style.display = 'none';
-        }
-    }
-
-    /* Handle booking form submission */
-    document.getElementById('bookingForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        // Handle the booking logic here (e.g., send data to server)
-        addMessage('Your booking has been submitted!', 'bot-message');
-        showPage('chatbot-container'); // Go back to chatbot
-    });
-
-    /* WhatsApp Button */
+    // WhatsApp Button
     document.getElementById('whatsapp-chat').addEventListener('click', () => {
         window.open('https://wa.me/254712328599', '_blank');
     });
