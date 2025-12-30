@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('chatbot-input');
     const messages = document.getElementById('chatbot-messages');
     const options = document.querySelectorAll('#chatbot-options button');
+    const bookingForm = document.getElementById('booking-form');
+    const serviceDetail = document.getElementById('service-detail');
 
     /* ===== Toggle chatbot ===== */
     toggle.addEventListener('click', () => container.style.display = 'flex');
@@ -64,9 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 });
         } else if (text.includes('book')) {
-            addMessage('Please specify the service you want to book.', 'bot-message');
+            showPage('booking-form');
+            addMessage('Booking form opened.', 'bot-message');
         } else if (text.includes('location')) {
-            addMessage('Our location is Naivasha road, Dagoretti Corner next to Shell petrol station.', 'bot-message');
+            addMessage('Our location is:', 'bot-message');
+            addMessage('<a href="https://www.google.com/maps/place/Naivasha+Road,+Dagoretti+Corner/@-1.329098,36.726317,17z" target="_blank">Click here to view on Google Maps</a>', 'bot-message', true);
         } else if (text.includes('contact')) {
             addMessage('Call 0712328599 or email info@hybridservice.com.', 'bot-message');
         } else {
@@ -86,23 +90,44 @@ document.addEventListener('DOMContentLoaded', () => {
                     const service = data.find(s => s.id === id);
                     if (!service) return;
 
-                    const detail = document.getElementById('service-detail');
-                    detail.querySelector('.container').innerHTML = `
+                    serviceDetail.querySelector('.container').innerHTML = `
                         <h2>${service.title}</h2>
                         <img src="${service.image}" style="max-width:100%;margin:20px 0;">
                         <p>${service.fullDescription}</p>
                     `;
 
-                    detail.style.display = 'block'; // Show service detail
+                    serviceDetail.style.display = 'block'; // Show service detail
                     container.style.display = 'none'; // Hide chatbot
                 });
         }
 
         /* BOOK NOW */
         if (e.target.classList.contains('book-service-btn')) {
-            addMessage(`Booking form opened for ${e.target.dataset.title}.`, 'bot-message');
-            // Implement booking form logic here
+            showPage('booking-form');
+            const serviceName = e.target.dataset.title;
+            document.getElementById('service').value = serviceName; // Set the service name in the booking form
+            addMessage(`Booking form opened for ${serviceName}.`, 'bot-message');
         }
+    });
+
+    /* Show specific page */
+    function showPage(page) {
+        if (page === 'booking-form') {
+            bookingForm.style.display = 'block';
+            container.style.display = 'none';
+        } else if (page === 'chatbot-container') {
+            container.style.display = 'flex';
+            bookingForm.style.display = 'none';
+            serviceDetail.style.display = 'none';
+        }
+    }
+
+    /* Handle booking form submission */
+    document.getElementById('form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        // Handle the booking logic here (e.g., send data to server)
+        addMessage('Your booking has been submitted!', 'bot-message');
+        showPage('chatbot-container'); // Go back to chatbot
     });
 
     /* WhatsApp Button */
