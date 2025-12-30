@@ -1,27 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* ================= NAVBAR SCROLL EFFECT ================= */
-  const header = document.querySelector('.site-header');
-
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 60) {
-      header.classList.add('scrolled');
-    } else {
-      header.classList.remove('scrolled');
-    }
-  });
-
   /* ================= SPA NAVIGATION ================= */
   const navLinks = document.querySelectorAll('[data-page]');
   const pages = document.querySelectorAll('.page');
 
-  window.showPage = function (pageId) {
+  function showPage(pageId) {
     pages.forEach(page => page.classList.remove('active'));
     const target = document.getElementById(pageId);
     if (target) target.classList.add('active');
     window.scrollTo(0, 0);
     history.replaceState(null, '', `#${pageId}`);
-  };
+  }
 
   navLinks.forEach(link => {
     link.addEventListener('click', e => {
@@ -38,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const slides = document.querySelectorAll('.slide');
   const dotsContainer = document.querySelector('.dots');
   let currentSlide = 0;
-  let slideInterval;
 
   if (slides.length && dotsContainer) {
     slides.forEach((_, i) => {
@@ -58,28 +46,27 @@ document.addEventListener('DOMContentLoaded', () => {
       currentSlide = index;
     }
 
-    function startSlideshow() {
-      slideInterval = setInterval(() => {
-        showSlide((currentSlide + 1) % slides.length);
-      }, 5000);
-    }
-
-    function stopSlideshow() {
-      clearInterval(slideInterval);
-    }
-
-    startSlideshow();
-
-    document.querySelector('.hero')?.addEventListener('mouseenter', stopSlideshow);
-    document.querySelector('.hero')?.addEventListener('mouseleave', startSlideshow);
+    // Auto slide with fade + zoom cinematic effect
+    setInterval(() => {
+      showSlide((currentSlide + 1) % slides.length);
+    }, 5000);
   }
+
+  /* ================= NAVBAR SCROLL EFFECT ================= */
+  const siteHeader = document.querySelector('.site-header');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      siteHeader.classList.add('scrolled');
+    } else {
+      siteHeader.classList.remove('scrolled');
+    }
+  });
 
   /* ================= BOOKING FORM ================= */
   const bookingForm = document.getElementById('bookingForm');
   if (bookingForm) {
     bookingForm.addEventListener('submit', e => {
       e.preventDefault();
-
       fetch(bookingForm.action, {
         method: bookingForm.method,
         body: new FormData(bookingForm),
@@ -87,13 +74,13 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .then(res => {
         if (res.ok) {
-          alert('Booking submitted successfully!');
+          alert('Booking submitted!');
           bookingForm.reset();
         } else {
-          alert('Booking failed. Try again.');
+          alert('Booking failed!');
         }
       })
-      .catch(() => alert('Network error. Please try again.'));
+      .catch(() => alert('Network error'));
     });
   }
 
@@ -103,17 +90,16 @@ document.addEventListener('DOMContentLoaded', () => {
   let servicesCache = [];
 
   if (serviceGrid) {
-    fetch('./services.json')   // 🔴 MUST be same folder as index.html
+    fetch('services.json')
       .then(res => res.json())
       .then(data => {
         servicesCache = data;
         serviceGrid.innerHTML = '';
-
         data.forEach(service => {
           const card = document.createElement('div');
           card.className = 'service-card';
           card.innerHTML = `
-            <img src="${service.image}" alt="${service.title}">
+            <img src="${service.image}" alt="${service.title}" style="width:100px;height:100px;object-fit:contain;">
             <h3>${service.title}</h3>
             <p>${service.shortDescription}</p>
             <button class="read-more-btn" data-id="${service.id}">Read More</button>
@@ -134,13 +120,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     serviceDetail.innerHTML = `
       <h2>${service.title}</h2>
-      <img src="${service.image}" alt="${service.title}">
+      <img src="${service.image}" alt="${service.title}" style="max-width:100%;margin:20px 0;">
       <p>${service.fullDescription}</p>
       <h4>What This Service Includes:</h4>
       <ul>
         ${service.includes.map(item => `<li>${item}</li>`).join('')}
       </ul>
-      <button id="back-to-services">← Back to Services</button>
+      <button id="back-to-services">Back to Our Services</button>
     `;
 
     showPage('service-detail');
