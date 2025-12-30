@@ -1,76 +1,86 @@
-// ================= NAVIGATION =================
-const menuToggle = document.querySelector('.menu-toggle');
-const navMenu = document.querySelector('.main-nav ul');
-menuToggle.addEventListener('click', () => {
-  navMenu.classList.toggle('show');
-});
+// ================= SPA NAVIGATION =================
+const pages = document.querySelectorAll(".page");
+const navLinks = document.querySelectorAll(".main-nav a");
 
-const pages = document.querySelectorAll('.page');
-document.querySelectorAll('.main-nav a').forEach(link => {
-  link.addEventListener('click', (e) => {
+navLinks.forEach(link => {
+  link.addEventListener("click", e => {
     e.preventDefault();
-    const target = link.dataset.page;
-    pages.forEach(p => p.classList.remove('active'));
-    document.getElementById(target).classList.add('active');
-    window.scrollTo(0, 0);
+    const pageId = link.dataset.page;
+    pages.forEach(page => {
+      page.style.display = page.id === pageId ? "block" : "none";
+      page.classList.toggle("active", page.id === pageId);
+    });
+    if(pageId === "our-services") loadServices();
   });
 });
 
-// ================= HERO SLIDES =================
-const slides = document.querySelectorAll('.slide');
-const dotsContainer = document.querySelector('.dots');
-let currentSlide = 0;
+// ================= HERO SLIDESHOW =================
+let slideIndex = 0;
+const slides = document.querySelectorAll(".slide");
+const dotsContainer = document.querySelector(".dots");
 
-// Generate dots
-slides.forEach((_, i) => {
-  const dot = document.createElement('span');
-  if (i === 0) dot.classList.add('active');
-  dot.addEventListener('click', () => showSlide(i));
-  dotsContainer.appendChild(dot);
-});
-const dots = dotsContainer.querySelectorAll('span');
+function showSlides() {
+  slides.forEach(s => s.classList.remove("active"));
+  dotsContainer.innerHTML = "";
+  slides[slideIndex].classList.add("active");
 
-function showSlide(n) {
-  slides[currentSlide].classList.remove('active');
-  dots[currentSlide].classList.remove('active');
-  currentSlide = n;
-  slides[currentSlide].classList.add('active');
-  dots[currentSlide].classList.add('active');
+  for(let i=0;i<slides.length;i++){
+    const dot = document.createElement("span");
+    dot.classList.add("dot");
+    if(i === slideIndex) dot.classList.add("active");
+    dot.addEventListener("click", ()=>{slideIndex=i; showSlides();});
+    dotsContainer.appendChild(dot);
+  }
+
+  slideIndex = (slideIndex + 1) % slides.length;
+  setTimeout(showSlides, 5000);
 }
-function nextSlide() {
-  let next = (currentSlide + 1) % slides.length;
-  showSlide(next);
-}
-setInterval(nextSlide, 5000);
 
-// ================= SERVICES =================
-fetch('services.json')
-  .then(res => res.json())
-  .then(data => {
-    const grid = document.querySelector('.service-grid');
-    data.forEach(service => {
-      const card = document.createElement('div');
-      card.classList.add('service-card');
-      card.innerHTML = `
-        <img src="${service.image}" alt="${service.title}">
-        <h3>${service.title}</h3>
-        <p>${service.shortDescription}</p>
-      `;
-      card.addEventListener('click', () => showServiceDetail(service));
-      grid.appendChild(card);
+showSlides();
+
+// ================= LOAD SERVICES =================
+async function loadServices() {
+  const serviceGrid = document.querySelector(".service-grid");
+  serviceGrid.innerHTML = "";
+  const res = await fetch("services.json");
+  const services = await res.json();
+
+  services.forEach(service => {
+    const card = document.createElement("div");
+    card.classList.add("service-card");
+    card.innerHTML = `
+      <img src="${service.image}" alt="${service.title}">
+      <h3>${service.title}</h3>
+      <p>${service.shortDescription}</p>
+      <button class="read-more" data-id="${service.id}">Read More</button>
+    `;
+    serviceGrid.appendChild(card);
+  });
+
+  document.querySelectorAll(".read-more").forEach(btn => {
+    btn.addEventListener("click", e => {
+      const id = btn.dataset.id;
+      const service = services.find(s => s.id === id);
+      showServiceDetail(service);
     });
   });
+}
 
-function showServiceDetail(service) {
-  pages.forEach(p => p.classList.remove('active'));
-  document.getElementById('service-detail').classList.add('active');
-  const container = document.querySelector('.service-detail-content');
-  container.innerHTML = `
+// ================= SERVICE DETAIL =================
+function showServiceDetail(service){
+  document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+  const detailPage = document.getElementById("service-detail");
+  detailPage.style.display = "block";
+  const content = detailPage.querySelector(".service-detail-content");
+  content.innerHTML = `
     <h2>${service.title}</h2>
-    <img src="${service.image}" alt="${service.title}" style="max-width:400px;width:100%;margin-bottom:1rem;">
+    <img src="${service.image}" alt="${service.title}">
     <p>${service.fullDescription}</p>
-    <h3>Includes:</h3>
-    <ul>${service.includes.map(item => `<li>${item}</li>`).join('')}</ul>
-    <button onclick="document.getElementById('booking').scrollIntoView({behavior:'smooth'});">Book Service</button>
+    <h4>Includes:</h4>
+    <ul>${service.includes.map(i => `<li>${i}</li>`).join("")}</ul>
   `;
+  document.getElementById("back-to-services").onclick = () => {
+    detailPage.style.display = "none";
+    document.getElementById("our-services").style.display = "block";
+  };
 }
