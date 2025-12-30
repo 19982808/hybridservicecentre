@@ -1,165 +1,76 @@
-document.addEventListener('DOMContentLoaded', () => {
-
-  /* ================= SPA NAVIGATION ================= */
-  const navLinks = document.querySelectorAll('[data-page]');
-  const pages = document.querySelectorAll('.page');
-
-  function showPage(pageId) {
-    pages.forEach(page => page.classList.remove('active'));
-    const target = document.getElementById(pageId);
-    if (target) target.classList.add('active');
-    window.scrollTo(0, 0);
-    history.replaceState(null, '', `#${pageId}`);
-  }
-
-  navLinks.forEach(link => {
-    link.addEventListener('click', e => {
-      e.preventDefault();
-      showPage(link.dataset.page);
-    });
-  });
-
-  const hash = window.location.hash.replace('#', '');
-  if (hash && document.getElementById(hash)) showPage(hash);
-  else showPage('home');
-
-  /* ================= NAVBAR SCROLL EFFECT ================= */
-  const header = document.querySelector('.site-header');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-      header.classList.add('scrolled');
-    } else {
-      header.classList.remove('scrolled');
-    }
-  });
-
-  /* ================= HERO SLIDESHOW ================= */
-  const slides = document.querySelectorAll('.slide');
-  const dotsContainer = document.querySelector('.dots');
-  let currentSlide = 0;
-  let slideInterval;
-
-  function showSlide(index) {
-    slides.forEach(s => s.classList.remove('active'));
-    const dots = document.querySelectorAll('.dot');
-    dots.forEach(d => d.classList.remove('active'));
-    slides[index].classList.add('active');
-    dots[index].classList.add('active');
-    currentSlide = index;
-  }
-
-  function startSlideShow() {
-    slideInterval = setInterval(() => {
-      showSlide((currentSlide + 1) % slides.length);
-    }, 5000);
-  }
-
-  function stopSlideShow() {
-    clearInterval(slideInterval);
-  }
-
-  if (slides.length && dotsContainer) {
-    slides.forEach((_, i) => {
-      const dot = document.createElement('span');
-      dot.className = 'dot' + (i === 0 ? ' active' : '');
-      dot.addEventListener('click', () => {
-        showSlide(i);
-        stopSlideShow();
-        startSlideShow();
-      });
-      dotsContainer.appendChild(dot);
-    });
-
-    const heroContainer = document.querySelector('.hero');
-    heroContainer.addEventListener('mouseenter', stopSlideShow);
-    heroContainer.addEventListener('mouseleave', startSlideShow);
-
-    showSlide(0);
-    startSlideShow();
-  }
-
-  /* ================= BOOKING FORM ================= */
-  const bookingForm = document.getElementById('bookingForm');
-  if (bookingForm) {
-    bookingForm.addEventListener('submit', e => {
-      e.preventDefault();
-      fetch(bookingForm.action, {
-        method: bookingForm.method,
-        body: new FormData(bookingForm),
-        headers: { 'Accept': 'application/json' }
-      })
-      .then(res => {
-        if (res.ok) {
-          alert('Booking submitted!');
-          bookingForm.reset();
-        } else {
-          alert('Booking failed!');
-        }
-      })
-      .catch(() => alert('Network error'));
-    });
-  }
-
-  /* ================= OUR SERVICES ================= */
-  const serviceGrid = document.querySelector('.service-grid');
-  const serviceDetail = document.getElementById('service-detail');
-  let servicesCache = [];
-
-  if (serviceGrid) {
-    fetch('services.json')
-      .then(res => res.json())
-      .then(data => {
-        servicesCache = data;
-        serviceGrid.innerHTML = '';
-
-        data.forEach(service => {
-          const card = document.createElement('div');
-          card.className = 'service-card';
-          card.innerHTML = `
-            <img src="${service.image}" alt="${service.title}" style="width:100px;height:100px;object-fit:contain;">
-            <h3>${service.title}</h3>
-            <p>${service.shortDescription}</p>
-            <button class="read-more-btn" data-id="${service.id}">Read More</button>
-          `;
-          serviceGrid.appendChild(card);
-        });
-
-        document.querySelectorAll('.read-more-btn').forEach(btn => {
-          btn.addEventListener('click', () => openServicePage(btn.dataset.id));
-        });
-      })
-      .catch(err => console.error('Service loading error:', err));
-  }
-
-  function openServicePage(id) {
-    const service = servicesCache.find(s => s.id === id);
-    if (!service || !serviceDetail) return;
-
-    serviceDetail.innerHTML = `
-      <h2>${service.title}</h2>
-      <img src="${service.image}" alt="${service.title}" style="max-width:100%;margin:20px 0;">
-      <p>${service.fullDescription}</p>
-      <h4>What This Service Includes:</h4>
-      <ul>
-        ${service.includes.map(item => `<li>${item}</li>`).join('')}
-      </ul>
-      <button id="back-to-services">Back to Our Services</button>
-    `;
-
-    showPage('service-detail');
-
-    document.getElementById('back-to-services')
-      .addEventListener('click', () => showPage('our-services'));
-  }
-
-  /* ================= CHATBOT ================= */
-  const chatbotToggle = document.getElementById('chatbot-toggle');
-  const chatbotContainer = document.getElementById('chatbot-container');
-
-  if (chatbotToggle && chatbotContainer) {
-    chatbotToggle.addEventListener('click', () => {
-      chatbotContainer.style.display = chatbotContainer.style.display === 'flex' ? 'none' : 'flex';
-    });
-  }
-
+// ================= NAVIGATION =================
+const menuToggle = document.querySelector('.menu-toggle');
+const navMenu = document.querySelector('.main-nav ul');
+menuToggle.addEventListener('click', () => {
+  navMenu.classList.toggle('show');
 });
+
+const pages = document.querySelectorAll('.page');
+document.querySelectorAll('.main-nav a').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = link.dataset.page;
+    pages.forEach(p => p.classList.remove('active'));
+    document.getElementById(target).classList.add('active');
+    window.scrollTo(0, 0);
+  });
+});
+
+// ================= HERO SLIDES =================
+const slides = document.querySelectorAll('.slide');
+const dotsContainer = document.querySelector('.dots');
+let currentSlide = 0;
+
+// Generate dots
+slides.forEach((_, i) => {
+  const dot = document.createElement('span');
+  if (i === 0) dot.classList.add('active');
+  dot.addEventListener('click', () => showSlide(i));
+  dotsContainer.appendChild(dot);
+});
+const dots = dotsContainer.querySelectorAll('span');
+
+function showSlide(n) {
+  slides[currentSlide].classList.remove('active');
+  dots[currentSlide].classList.remove('active');
+  currentSlide = n;
+  slides[currentSlide].classList.add('active');
+  dots[currentSlide].classList.add('active');
+}
+function nextSlide() {
+  let next = (currentSlide + 1) % slides.length;
+  showSlide(next);
+}
+setInterval(nextSlide, 5000);
+
+// ================= SERVICES =================
+fetch('services.json')
+  .then(res => res.json())
+  .then(data => {
+    const grid = document.querySelector('.service-grid');
+    data.forEach(service => {
+      const card = document.createElement('div');
+      card.classList.add('service-card');
+      card.innerHTML = `
+        <img src="${service.image}" alt="${service.title}">
+        <h3>${service.title}</h3>
+        <p>${service.shortDescription}</p>
+      `;
+      card.addEventListener('click', () => showServiceDetail(service));
+      grid.appendChild(card);
+    });
+  });
+
+function showServiceDetail(service) {
+  pages.forEach(p => p.classList.remove('active'));
+  document.getElementById('service-detail').classList.add('active');
+  const container = document.querySelector('.service-detail-content');
+  container.innerHTML = `
+    <h2>${service.title}</h2>
+    <img src="${service.image}" alt="${service.title}" style="max-width:400px;width:100%;margin-bottom:1rem;">
+    <p>${service.fullDescription}</p>
+    <h3>Includes:</h3>
+    <ul>${service.includes.map(item => `<li>${item}</li>`).join('')}</ul>
+    <button onclick="document.getElementById('booking').scrollIntoView({behavior:'smooth'});">Book Service</button>
+  `;
+}
