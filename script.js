@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const navLinks = document.querySelectorAll('[data-page]');
   const pages = document.querySelectorAll('.page');
 
-  function showPage(pageId) {
+  // ✅ Make showPage global
+  window.showPage = function(pageId) {
     pages.forEach(page => page.classList.remove('active'));
     const target = document.getElementById(pageId);
     if (target) target.classList.add('active');
