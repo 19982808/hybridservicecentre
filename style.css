@@ -22,31 +22,29 @@ h2 {
 
 /* ==================== Header & Navbar ==================== */
 .site-header {
+  background: transparent;
+  color: #fff;
+  padding: 15px 0;
   position: sticky;
   top: 0;
   z-index: 1000;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 0;
-  background: transparent; /* will turn blue on scroll */
-  transition: background 0.3s ease, padding 0.3s ease;
+  transition: background 0.3s ease;
 }
 
 .site-header.scrolled {
-  background: #1E3A5F; /* blue on scroll */
+  background: #1E3A5F; /* navbar blue on scroll */
 }
 
 .header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
 }
 
 .site-header .logo {
-  height: 70px; /* fits navbar top-to-bottom */
+  height: 60px; /* adjust top-to-bottom fit */
   width: auto;
+  object-fit: contain;
 }
 
 .main-nav ul {
@@ -58,7 +56,7 @@ h2 {
 }
 
 .main-nav ul li a {
-  color: #fff; /* match logo color */
+  color: #fff; /* navbar links white */
   text-decoration: none;
   padding: 5px 10px;
   transition: 0.3s;
@@ -70,14 +68,14 @@ h2 {
   border-radius: 5px;
 }
 
-/* ==================== Hero Section ==================== */
+/* ==================== HERO ==================== */
 .hero {
   position: relative;
   width: 100%;
-  height: 80vh;
+  height: 100vh;
   overflow: hidden;
   color: #1E3A5F;
-  background-color: #e5e5e5; /* neutral bg to make slides pop */
+  background: #e0e7ff; /* lighter background to make slides pop */
 }
 
 .slideshow {
@@ -93,16 +91,15 @@ h2 {
   background-size: cover;
   opacity: 0;
   transform: scale(1);
-  transition: opacity 0.5s ease-in-out, transform 6s ease;
-  filter: brightness(1.1) contrast(1.05); /* boost visibility */
+  transition: opacity 1.2s ease-in-out, transform 6s ease;
+  filter: brightness(1.2) contrast(1.1); /* boost */
 }
 
 .slide.active {
   opacity: 1;
-  transform: scale(1.08); /* subtle zoom cinematic effect */
+  transform: scale(1.08);
 }
 
-/* Hero content */
 .hero-content {
   position: relative;
   z-index: 2;
@@ -114,12 +111,14 @@ h2 {
   align-items: center;
   text-align: center;
   padding: 20px;
+  animation: fadeInUp 1.5s ease;
 }
 
 .hero-content h1 {
   font-size: clamp(2.2rem, 5vw, 3.5rem);
   margin-bottom: 10px;
   text-shadow: 1px 1px 3px rgba(255,255,255,0.6);
+  animation: slideInDown 1.5s ease;
 }
 
 .hero-content p {
@@ -206,9 +205,51 @@ section {
 
 /* ==================== Our Links ==================== */
 #our-links {
-  background: #1E3A5F; /* blue background */
+  background: #1E3A5F; /* blue again */
   color: #F1C40F;
   padding: 50px 0;
+}
+
+#our-links h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2rem;
+}
+
+.links-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: space-between;
+}
+
+.link-group {
+  flex: 1 1 250px;
+}
+
+.link-group h3 {
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  border-bottom: 1px solid #F1C40F;
+  padding-bottom: 5px;
+}
+
+.link-group ul {
+  list-style: none;
+  padding: 0;
+}
+
+.link-group ul li {
+  margin-bottom: 10px;
+}
+
+.link-group ul li a {
+  color: #F1C40F;
+  text-decoration: none;
+}
+
+.link-group ul li a:hover {
+  text-decoration: underline;
 }
 
 /* ==================== Footer ==================== */
@@ -219,10 +260,59 @@ footer {
   text-align: center;
 }
 
+footer .social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+footer .social-icons img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+/* ==================== Chatbot ==================== */
+#chatbot-toggle {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background: #F1C40F;
+  color: #1E3A5F;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 28px;
+  cursor: pointer;
+  z-index: 10001;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: transform 0.3s;
+}
+
+#chatbot-toggle:hover {
+  transform: scale(1.1);
+}
+
+/* ==================== Animations ==================== */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInDown {
+  0% { opacity: 0; transform: translateY(-50px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
 /* ==================== Responsive ==================== */
 @media (max-width: 768px) {
   .hero {
-    height: 60vh;
+    height: 80vh;
   }
   .hero-content h1 {
     font-size: 2rem;
