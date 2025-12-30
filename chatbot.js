@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const messages = document.getElementById('chatbot-messages');
   const options = document.querySelectorAll('#chatbot-options button');
   const bookingForm = document.getElementById('bookingForm');
+  const serviceDetail = document.getElementById('service-detail');
+  let servicesCache = [];
 
   /* ===== Toggle chatbot ===== */
   toggle.addEventListener('click', () => container.style.display = 'flex');
@@ -56,8 +58,12 @@ document.addEventListener('DOMContentLoaded', () => {
       fetch('services.json')
         .then(res => res.json())
         .then(data => {
-          if (!data.length) return addMessage('No services available.', 'bot-message');
+          if (!data.length) {
+            addMessage('No services available.', 'bot-message');
+            return;
+          }
 
+          servicesCache = data; // store for later use
           addMessage('Here are our services:', 'bot-message');
 
           data.forEach(service => {
@@ -74,13 +80,14 @@ document.addEventListener('DOMContentLoaded', () => {
             addMessage(content, 'bot-message', true);
           });
         });
+
     } else if (text.includes('book')) {
       showPage('booking');
       addMessage('Booking form opened.', 'bot-message');
 
     } else if (text.includes('location')) {
-      showPage('location');
-      addMessage('Our location is Naivasha road, Dagoretti Corner next to Shell petrol station.', 'bot-message');
+      showPage('contact'); // assuming location is in contact page
+      addMessage('Our location: Naivasha road, Dagoretti Corner next to Shell petrol station.', 'bot-message');
 
     } else if (text.includes('contact')) {
       showPage('contact');
@@ -94,31 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ===== Event delegation inside chatbot ===== */
   messages.addEventListener('click', e => {
 
-    /* READ MORE */
+    // READ MORE
     if (e.target.classList.contains('service-chat-btn')) {
       const id = e.target.dataset.id;
-      fetch('services.json')
-        .then(res => res.json())
-        .then(data => {
-          const service = data.find(s => s.id === id);
-          if (!service) return;
-
-          const detail = document.getElementById('service-detail');
-          detail.querySelector('.container').innerHTML = `
-            <h2>${service.title}</h2>
-            <img src="${service.image}" style="max-width:100%;margin:20px 0;">
-            <p>${service.fullDescription}</p>
-            <h4>What This Service Includes:</h4>
-            <ul>
-              ${service.includes.map(item => `<li>${item}</li>`).join('')}
-            </ul>
-            <button class="back-services-btn">Back to Our Services</button>
-          `;
-          showPage('service-detail');
-        });
+      openServicePage(id);
     }
 
-    /* BOOK NOW */
+    // BOOK NOW
     if (e.target.classList.contains('book-service-btn')) {
       showPage('booking');
       if (bookingForm) {
@@ -127,10 +116,32 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       addMessage(`Booking form opened for ${e.target.dataset.title}`, 'bot-message');
     }
-
-    /* BACK TO OUR SERVICES */
-    if (e.target.classList.contains('back-services-btn')) {
-      showPage('our-services');
-    }
   });
+
+  /* ===== Open service page with back button ===== */
+  function openServicePage(id) {
+    const service = servicesCache.find(s => s.id === id);
+    if (!service || !serviceDetail) return;
+
+    serviceDetail.innerHTML = `
+      <h2>${service.title}</h2>
+      <img src="${service.image}" alt="${service.title}" style="max-width:100%;margin:20px 0;">
+      <p>${service.fullDescription}</p>
+      <h4>What This Service Includes:</h4>
+      <ul>
+        ${service.includes.map(item => `<li>${item}</li>`).join('')}
+      </ul>
+      <button id="back-to-services">Back to Our Services</button>
+    `;
+
+    showPage('service-detail');
+
+    // Attach event listener for Back button
+    const backBtn = document.getElementById('back-to-services');
+    if (backBtn) {
+      backBtn.addEventListener('click', () => showPage('our-services'));
+    }
+  }
+
 });
+
