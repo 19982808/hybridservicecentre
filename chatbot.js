@@ -56,7 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
       fetch('services.json')
         .then(res => res.json())
         .then(data => {
-          if (!data.length) return addMessage('No services available.', 'bot-message');
+          if (!data.length) {
+            addMessage('No services available.', 'bot-message');
+            return;
+          }
 
           addMessage('Here are our services:', 'bot-message');
 
@@ -74,13 +77,14 @@ document.addEventListener('DOMContentLoaded', () => {
             addMessage(content, 'bot-message', true);
           });
         });
+
     } else if (text.includes('book')) {
       showPage('booking');
       addMessage('Booking form opened.', 'bot-message');
 
     } else if (text.includes('location')) {
       showPage('location');
-      addMessage('Our location is Naivasha road, Dagoretti Corner next to Shell petrol station.', 'bot-message');
+      addMessage('Our location is  Naivasha road, Dagoretti Corner next ro Shell petrol station.', 'bot-message');
 
     } else if (text.includes('contact')) {
       showPage('contact');
@@ -97,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
     /* READ MORE */
     if (e.target.classList.contains('service-chat-btn')) {
       const id = e.target.dataset.id;
+
       fetch('services.json')
         .then(res => res.json())
         .then(data => {
@@ -108,12 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
             <h2>${service.title}</h2>
             <img src="${service.image}" style="max-width:100%;margin:20px 0;">
             <p>${service.fullDescription}</p>
-            <h4>What This Service Includes:</h4>
-            <ul>
-              ${service.includes.map(item => `<li>${item}</li>`).join('')}
-            </ul>
-            <button class="back-services-btn">Back to Our Services</button>
+            <button onclick="showPage('our-services')">Back to Our Services</button>
           `;
+
           showPage('service-detail');
         });
     }
@@ -121,16 +123,15 @@ document.addEventListener('DOMContentLoaded', () => {
     /* BOOK NOW */
     if (e.target.classList.contains('book-service-btn')) {
       showPage('booking');
+
       if (bookingForm) {
         const msg = bookingForm.querySelector('textarea[name="message"]');
         if (msg) msg.value = `Booking request for: ${e.target.dataset.title}`;
       }
+
       addMessage(`Booking form opened for ${e.target.dataset.title}`, 'bot-message');
     }
-
-    /* BACK TO OUR SERVICES */
-    if (e.target.classList.contains('back-services-btn')) {
-      showPage('our-services');
-    }
   });
+
 });
+ 
