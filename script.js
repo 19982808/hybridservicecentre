@@ -1,15 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-  // ================= SPA PAGE SWITCHING (GLOBAL) =================
-window.showPage = function(pageId) {
+  /* ================= SPA NAVIGATION + HASH SUPPORT ================= */
+  const navLinks = document.querySelectorAll('[data-page]');
   const pages = document.querySelectorAll('.page');
-  pages.forEach(p => p.classList.remove('active'));
-  const target = document.getElementById(pageId);
-  if (target) target.classList.add('active');
-  window.scrollTo(0, 0);
-  history.replaceState(null, '', `#${pageId}`);
-}
 
+  function showPage(pageId) {
+    pages.forEach(page => page.classList.remove('active'));
+    const target = document.getElementById(pageId);
+    if (target) target.classList.add('active');
+    window.scrollTo(0, 0);
+    history.replaceState(null, '', `#${pageId}`);
+  }
 
   navLinks.forEach(link => {
     link.addEventListener('click', e => {
@@ -100,44 +101,33 @@ window.showPage = function(pageId) {
   loadServices();
 
   /* ================= SERVICE DETAIL PAGE ================= */
-  function openServicePage(id) {
-  fetch('services.json')
-    .then(res => res.json())
-    .then(data => {
-      const service = data.find(s => s.id === id);
-      if (service) {
-        let serviceDetail = document.getElementById('service-detail');
-
-        // Create the section if it doesn't exist
-        if (!serviceDetail) {
-          serviceDetail = document.createElement('section');
-          serviceDetail.id = 'service-detail';
-          serviceDetail.className = 'page';
-          document.body.appendChild(serviceDetail);
+  function openServicePage(id){
+    fetch('services.json')
+      .then(res => res.json())
+      .then(data => {
+        const service = data.find(s => s.id === id);
+        if(service){
+          let serviceDetail = document.getElementById('service-detail');
+          if(!serviceDetail){
+            serviceDetail = document.createElement('section');
+            serviceDetail.id = 'service-detail';
+            serviceDetail.className = 'page';
+            document.body.appendChild(serviceDetail);
+          }
+          serviceDetail.innerHTML = `
+            <div class="container">
+              <h2>${service.title}</h2>
+              <img src="${service.image}" alt="${service.title}" style="max-width:100%; margin:20px 0;">
+              <p>${service.fullDescription}</p>
+              <h4>Includes:</h4>
+              <ul>${service.includes.map(item=>`<li>${item}</li>`).join('')}</ul>
+              <button onclick="showPage('services')">Back to Services</button>
+            </div>
+          `;
+          showPage('service-detail');
         }
-
-        // Add content with Back button
-        serviceDetail.innerHTML = `
-          <div class="container">
-            <h2>${service.title}</h2>
-            <img src="${service.image}" alt="${service.title}" style="max-width:100%; margin:20px 0;">
-            <p>${service.description}</p>
-            <button id="back-to-services">Back to Services</button>
-          </div>
-        `;
-
-        // Add click listener for Back button
-        const backBtn = document.getElementById('back-to-services');
-        backBtn.addEventListener('click', () => window.showPage('services'));
-
-        // Show the service detail page
-        window.showPage('service-detail');
-      }
-    })
-    .catch(err => console.error('Error loading service:', err));
-}
-
-  
+      });
+  }
 
   /* ================= CHATBOT ================= */
   const toggle = document.getElementById('chatbot-toggle');
