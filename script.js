@@ -101,31 +101,65 @@ document.addEventListener('DOMContentLoaded', () => {
   // ===== COPY TO CLIPBOARD =====
   window.copyText = text => navigator.clipboard.writeText(text).then(()=>alert('Copied: '+text)).catch(()=>alert('Copy failed'));
 
-  // ===== LOAD SERVICES =====
-  const serviceContainer = document.querySelector('.service-grid');
-  if(serviceContainer){
-    fetch('services.json')
-      .then(res => res.json())
-      .then(data => {
-        data.forEach(service => {
-          const card = document.createElement('div');
-          card.className = 'service-card';
-          card.innerHTML = `
-            <i class="${service.icon}" style="font-size:40px;color:#1E3A5F;margin-bottom:10px;"></i>
-            <h3>${service.title}</h3>
-            <p>${service.description}</p>
-            <button class="service-btn" data-id="${service.id}">Read More</button>
-          `;
-          serviceContainer.appendChild(card);
-        });
+ // ================= LOAD SERVICES =================
+const serviceContainer = document.querySelector('.service-grid');
+if(serviceContainer){
+  fetch('services.json')
+    .then(res => res.json())
+    .then(data => {
+      data.forEach(service => {
+        const card = document.createElement('div');
+        card.className = 'service-card';
+        card.innerHTML = `
+          <h3>${service.title}</h3>
+          <p>${service.shortDescription || 'No description available'}</p>
+          <button class="service-btn" data-id="${service.id}">Read More</button>
+        `;
+        serviceContainer.appendChild(card);
+      });
 
-        // Add click event for "Read More" buttons
-        document.querySelectorAll('.service-btn').forEach(btn => {
-          btn.addEventListener('click', () => openServicePage(btn.dataset.id));
-        });
-      })
-      .catch(err => console.error("Error loading services.json:", err));
-  }
+      // Add click events for "Read More"
+      document.querySelectorAll('.service-btn').forEach(btn => {
+        btn.addEventListener('click', () => openServicePage(btn.dataset.id));
+      });
+    })
+    .catch(err => console.error("Error loading services.json:", err));
+}
+
+// ================= SERVICE DETAIL PAGE =================
+function openServicePage(id){
+  fetch('services.json')
+    .then(res => res.json())
+    .then(data => {
+      const service = data.find(s => s.id === id);
+      if(service){
+        let serviceDetail = document.getElementById('service-detail');
+        if(!serviceDetail){
+          serviceDetail = document.createElement('section');
+          serviceDetail.id = 'service-detail';
+          serviceDetail.className = 'page';
+          document.body.appendChild(serviceDetail);
+        }
+
+        // Build list of "includes"
+        const includesList = service.includes ? `<ul>${service.includes.map(i=>`<li>${i}</li>`).join('')}</ul>` : '';
+
+        serviceDetail.innerHTML = `
+          <div class="container">
+            <h2>${service.title}</h2>
+            <img src="${service.image}" alt="${service.title}" style="max-width:100%; margin:20px 0;">
+            <p>${service.fullDescription || service.shortDescription || 'No description available'}</p>
+            ${includesList}
+            <button onclick="showPage('services')">Back to Services</button>
+          </div>
+        `;
+        showPage('service-detail');
+      }
+    });
+}
+
+// Make global so buttons can access it
+window.openServicePage = openServicePage;
 
   // ===== CHATBOT =====
   const toggle = document.getElementById('chatbot-toggle');
