@@ -8,28 +8,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const options = document.querySelectorAll('#chatbot-options button');
   const bookingForm = document.getElementById('bookingForm');
 
-  /* ===== GLOBAL PAGE NAVIGATION ===== */
-  window.showPage = function(pageId) {
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(p => p.classList.remove('active'));
-    const target = document.getElementById(pageId);
-    if (target) target.classList.add('active');
-    window.scrollTo(0, 0);
-    history.replaceState(null, '', `#${pageId}`);
-  };
-
-  /* ===== TOGGLE CHATBOT ===== */
+  /* ===== Toggle chatbot ===== */
   toggle.addEventListener('click', () => container.style.display = 'flex');
   closeBtn.addEventListener('click', () => container.style.display = 'none');
 
-  /* ===== SEND MESSAGE ===== */
+  /* ===== Send message ===== */
   function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
     addMessage(text, 'user-message');
     input.value = '';
     messages.scrollTop = messages.scrollHeight;
-    setTimeout(() => processMessage(text.toLowerCase()), 300);
+    setTimeout(() => processMessage(text.toLowerCase()), 400);
   }
 
   sendBtn.addEventListener('click', sendMessage);
@@ -37,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') sendMessage();
   });
 
-  /* ===== OPTION BUTTONS ===== */
+  /* ===== Option buttons ===== */
   options.forEach(btn => {
     btn.addEventListener('click', () => {
       const option = btn.dataset.option;
@@ -50,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /* ===== ADD MESSAGE ===== */
+  /* ===== Add message ===== */
   function addMessage(text, className, html = false) {
     const div = document.createElement('div');
     div.className = className;
@@ -60,16 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
     messages.scrollTop = messages.scrollHeight;
   }
 
-  /* ===== PROCESS USER INPUT ===== */
+  /* ===== Process user input ===== */
   function processMessage(text) {
-    if (text.includes('service') || text.includes('services')) {
+    if (text.includes('service')) {
       fetch('services.json')
         .then(res => res.json())
         .then(data => {
-          if (!data.length) {
-            addMessage('No services available.', 'bot-message');
-            return;
-          }
+          if (!data.length) return addMessage('No services available.', 'bot-message');
 
           addMessage('Here are our services:', 'bot-message');
 
@@ -87,17 +74,16 @@ document.addEventListener('DOMContentLoaded', () => {
             addMessage(content, 'bot-message', true);
           });
         });
-
     } else if (text.includes('book')) {
-      window.showPage('booking');
+      showPage('booking');
       addMessage('Booking form opened.', 'bot-message');
 
     } else if (text.includes('location')) {
-      window.showPage('location');
-      addMessage('Our location is Naivasha Road, Dagoretti Corner next to Shell petrol station.', 'bot-message');
+      showPage('location');
+      addMessage('Our location is Naivasha road, Dagoretti Corner next to Shell petrol station.', 'bot-message');
 
     } else if (text.includes('contact')) {
-      window.showPage('contact');
+      showPage('contact');
       addMessage('Call 0712328599 or email info@hybridservice.com.', 'bot-message');
 
     } else {
@@ -105,13 +91,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /* ===== EVENT DELEGATION FOR DYNAMIC BUTTONS ===== */
+  /* ===== Event delegation inside chatbot ===== */
   messages.addEventListener('click', e => {
 
-    // Read More inside chatbot
+    /* READ MORE */
     if (e.target.classList.contains('service-chat-btn')) {
       const id = e.target.dataset.id;
-
       fetch('services.json')
         .then(res => res.json())
         .then(data => {
@@ -123,30 +108,29 @@ document.addEventListener('DOMContentLoaded', () => {
             <h2>${service.title}</h2>
             <img src="${service.image}" style="max-width:100%;margin:20px 0;">
             <p>${service.fullDescription}</p>
+            <h4>What This Service Includes:</h4>
+            <ul>
+              ${service.includes.map(item => `<li>${item}</li>`).join('')}
+            </ul>
             <button class="back-services-btn">Back to Our Services</button>
           `;
-          window.showPage('service-detail');
+          showPage('service-detail');
         });
     }
 
-    // Book Now inside chatbot
+    /* BOOK NOW */
     if (e.target.classList.contains('book-service-btn')) {
-      window.showPage('booking');
-
+      showPage('booking');
       if (bookingForm) {
         const msg = bookingForm.querySelector('textarea[name="message"]');
         if (msg) msg.value = `Booking request for: ${e.target.dataset.title}`;
       }
-
       addMessage(`Booking form opened for ${e.target.dataset.title}`, 'bot-message');
     }
 
-    /// Delegated click inside chatbot messages
-messages.addEventListener('click', e => {
-  // Back to Our Services button
-  if (e.target.classList.contains('back-services-btn')) {
-    window.showPage('our-services'); // make sure your "our-services" section has id="our-services"
-  }
+    /* BACK TO OUR SERVICES */
+    if (e.target.classList.contains('back-services-btn')) {
+      showPage('our-services');
+    }
+  });
 });
-
-   
