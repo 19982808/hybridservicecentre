@@ -1,145 +1,267 @@
-/* ================= GLOBAL SERVICES DATA ================= */
-const SERVICES = [
-  {
-    id: "engine",
-    title: "Hybrid Engine Service",
-    shortDescription: "Specialized servicing for hybrid engines.",
-    fullDescription: "Inspection and servicing of Atkinson-cycle hybrid engines, fuel systems, cooling, and performance optimization.",
-    image: "services/engine.png"
-  },
-  {
-    id: "software",
-    title: "Software Updates",
-    shortDescription: "Hybrid ECU software updates.",
-    fullDescription: "Firmware updates, calibration, error fixes, and performance tuning for hybrid control units.",
-    image: "services/software.png"
-  },
-  {
-    id: "maintenance",
-    title: "General Maintenance",
-    shortDescription: "Routine hybrid vehicle maintenance.",
-    fullDescription: "Cooling systems, AC service, suspension checks, alignment, and preventive maintenance.",
-    image: "services/maintenance.png"
-  },
-  {
-    id: "brake",
-    title: "Brake System Service",
-    shortDescription: "Regenerative brake servicing.",
-    fullDescription: "Inspection of brake pads, discs, actuators, and regenerative braking systems.",
-    image: "services/brake.png"
-  },
-  {
-    id: "battery",
-    title: "Hybrid Battery Service",
-    shortDescription: "High-voltage battery diagnostics & repair.",
-    fullDescription: "Battery health checks, cell balancing, cooling system inspection, and repair.",
-    image: "services/battery.png"
-  },
-  {
-    id: "diagnostics",
-    title: "Hybrid Diagnostics",
-    shortDescription: "Advanced hybrid system diagnostics.",
-    fullDescription: "Full ECU scanning, fault code analysis, live data monitoring, and system health reports.",
-    image: "services/diagnostics.png"
-  }
-];
-
-/* ================= PAGE NAVIGATION ================= */
+// ================= GLOBAL FUNCTIONS =================
 function showPage(pageId) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  const page = document.getElementById(pageId);
-  if (page) page.classList.add("active");
-
-  document.querySelectorAll(".main-nav a").forEach(a => a.classList.remove("active"));
-  document.querySelector(`.main-nav a[data-page="${pageId}"]`)?.classList.add("active");
+  const pages = document.querySelectorAll('.page');
+  pages.forEach(p => p.classList.remove('active'));
+  const target = document.getElementById(pageId);
+  if (target) target.classList.add('active');
+  window.scrollTo(0, 0);
+  history.replaceState(null, '', `#${pageId}`);
 }
 
-document.querySelectorAll("[data-page]").forEach(link => {
-  link.addEventListener("click", e => {
-    e.preventDefault();
-    showPage(link.dataset.page);
-  });
-});
+// Make it global so inline onclick can access
+window.showPage = showPage;
 
-/* ================= SERVICES SECTION ================= */
-const serviceGrid = document.querySelector(".service-grid");
+function openServicePage(id) {
+  fetch('services.json')
+    .then(res => res.json())
+    .then(data => {
+      const service = data.find(s => s.id === id);
+      if (service) {
+        let serviceDetail = document.getElementById('service-detail');
+        if (!serviceDetail) {
+          serviceDetail = document.createElement('section');
+          serviceDetail.id = 'service-detail';
+          serviceDetail.className = 'page';
+          document.body.appendChild(serviceDetail);
+        }
 
-if (serviceGrid) {
-  serviceGrid.innerHTML = SERVICES.map(service => `
-    <div class="service-card">
-      <img src="${service.image}" alt="${service.title}">
-      <h3>${service.title}</h3>
-      <p>${service.shortDescription}</p>
-    </div>
-  `).join("");
+        serviceDetail.innerHTML = `
+          <div class="container">
+            <h2>${service.title}</h2>
+            <img src="${service.image}" alt="${service.title}" style="max-width:100%; margin:20px 0;">
+            <p>${service.description}</p>
+            <button onclick="showPage('services')">Back to Services</button>
+          </div>
+        `;
+        showPage('service-detail');
+      }
+    });
 }
 
-/* ================= HERO SLIDER ================= */
-let slides = document.querySelectorAll(".slide");
-let dotsContainer = document.querySelector(".dots");
-let currentSlide = 0;
+// Make global so buttons can call it
+window.openServicePage = openServicePage;
 
-if (slides.length && dotsContainer) {
-  slides.forEach((_, i) => {
-    const dot = document.createElement("span");
-    dot.className = i === 0 ? "dot active" : "dot";
-    dot.onclick = () => goToSlide(i);
-    dotsContainer.appendChild(dot);
+// ================= DOM CONTENT LOADED =================
+document.addEventListener('DOMContentLoaded', () => {
+
+  // ===== SPA NAVIGATION =====
+  const navLinks = document.querySelectorAll('[data-page]');
+  navLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      showPage(link.dataset.page);
+    });
   });
 
-  function goToSlide(index) {
-    slides[currentSlide].classList.remove("active");
-    dotsContainer.children[currentSlide].classList.remove("active");
-    currentSlide = index;
-    slides[currentSlide].classList.add("active");
-    dotsContainer.children[currentSlide].classList.add("active");
+  const hashPage = window.location.hash.replace('#','');
+  if (hashPage && document.getElementById(hashPage)) showPage(hashPage);
+  else showPage('home');
+
+  // ===== HERO SLIDESHOW =====
+  const slides = document.querySelectorAll('.slide');
+  const dotsContainer = document.querySelector('.dots');
+  let currentSlide = 0;
+  let slideInterval;
+
+  if (slides.length && dotsContainer) {
+    slides.forEach((_, index) => {
+      const dot = document.createElement('span');
+      dot.className = 'dot' + (index === 0 ? ' active' : '');
+      dot.addEventListener('click', () => { showSlide(index); resetAutoSlide(); });
+      dotsContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll('.dot');
+
+    function showSlide(index) {
+      slides.forEach(slide => slide.classList.remove('active'));
+      dots.forEach(dot => dot.classList.remove('active'));
+      slides[index].classList.add('active');
+      dots[index].classList.add('active');
+      currentSlide = index;
+    }
+
+    function nextSlide() { showSlide((currentSlide + 1) % slides.length); }
+    function startAutoSlide() { slideInterval = setInterval(nextSlide, 5000); }
+    function resetAutoSlide() { clearInterval(slideInterval); startAutoSlide(); }
+    startAutoSlide();
   }
 
-  setInterval(() => {
-    goToSlide((currentSlide + 1) % slides.length);
-  }, 5000);
-}
+  // ===== BOOKING FORM =====
+  const bookingForm = document.getElementById('bookingForm');
+  if (bookingForm) {
+    bookingForm.addEventListener('submit', e => {
+      e.preventDefault();
+      fetch(bookingForm.action, { method: bookingForm.method, body: new FormData(bookingForm), headers:{'Accept':'application/json'} })
+        .then(res => res.ok ? (alert('Booking submitted!'), bookingForm.reset()) : alert('Booking failed!'))
+        .catch(()=>alert('Network error!'));
+    });
+  }
 
-/* ================= CHATBOT ================= */
-const chatbotToggle = document.getElementById("chatbot-toggle");
-const chatbotContainer = document.getElementById("chatbot-container");
-const chatbotClose = document.getElementById("chatbot-close");
-const chatbotMessages = document.getElementById("chatbot-messages");
+  // ===== COPY TO CLIPBOARD =====
+  window.copyText = text => navigator.clipboard.writeText(text).then(()=>alert('Copied: '+text)).catch(()=>alert('Copy failed'));
 
-chatbotToggle.onclick = () => chatbotContainer.classList.add("open");
-chatbotClose.onclick = () => chatbotContainer.classList.remove("open");
-
-function botMessage(html) {
-  chatbotMessages.innerHTML += `<div class="bot-message">${html}</div>`;
-  chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-}
-
-document.querySelectorAll("#chatbot-options button").forEach(btn => {
-  btn.onclick = () => {
-    const option = btn.dataset.option;
-
-    if (option === "services") {
-      SERVICES.forEach(service => {
-        botMessage(`
-          <strong>${service.title}</strong><br>
-          ${service.shortDescription}<br>
-          <img src="${service.image}" style="width:100%;border-radius:8px;margin-top:6px">
-        `);
+ // ================= LOAD SERVICES =================
+const serviceContainer = document.querySelector('.service-grid');
+if(serviceContainer){
+  fetch('services.json')
+    .then(res => res.json())
+    .then(data => {
+      data.forEach(service => {
+        const card = document.createElement('div');
+        card.className = 'service-card';
+        card.innerHTML = `
+          <h3>${service.title}</h3>
+          <p>${service.shortDescription || 'No description available'}</p>
+          <button class="service-btn" data-id="${service.id}">Read More</button>
+        `;
+        serviceContainer.appendChild(card);
       });
-    }
 
-    if (option === "book") {
-      botMessage("To book a service, please visit the Book section or WhatsApp us.");
-      showPage("booking");
-    }
+      // Add click events for "Read More"
+      document.querySelectorAll('.service-btn').forEach(btn => {
+        btn.addEventListener('click', () => openServicePage(btn.dataset.id));
+      });
+    })
+    .catch(err => console.error("Error loading services.json:", err));
+}
 
-    if (option === "location") {
-      botMessage("We are located in Nairobi, Kenya. See the Location section for directions.");
-      showPage("location");
+// ================= SERVICE DETAIL PAGE =================
+function openServicePage(id){
+  fetch('services.json')
+    .then(res => res.json())
+    .then(data => {
+      const service = data.find(s => s.id === id);
+      if(service){
+        let serviceDetail = document.getElementById('service-detail');
+        if(!serviceDetail){
+          serviceDetail = document.createElement('section');
+          serviceDetail.id = 'service-detail';
+          serviceDetail.className = 'page';
+          document.body.appendChild(serviceDetail);
+        }
+
+        // Build list of "includes"
+        const includesList = service.includes ? `<ul>${service.includes.map(i=>`<li>${i}</li>`).join('')}</ul>` : '';
+
+        serviceDetail.innerHTML = `
+          <div class="container">
+            <h2>${service.title}</h2>
+            <img src="${service.image}" alt="${service.title}" style="max-width:100%; margin:20px 0;">
+            <p>${service.fullDescription || service.shortDescription || 'No description available'}</p>
+            ${includesList}
+            <button onclick="showPage('services')">Back to Services</button>
+          </div>
+        `;
+        showPage('service-detail');
+      }
+    });
+}
+
+// Make global so buttons can access it
+window.openServicePage = openServicePage;
+
+  // ===== CHATBOT =====
+  const toggle = document.getElementById('chatbot-toggle');
+  const container = document.getElementById('chatbot-container');
+  const closeBtn = document.getElementById('chatbot-close');
+  const sendBtn = document.getElementById('chatbot-send');
+  const input = document.getElementById('chatbot-input');
+  const messages = document.getElementById('chatbot-messages');
+  const options = document.querySelectorAll('#chatbot-options button');
+
+  toggle.addEventListener('click', () => container.style.display = 'flex');
+  closeBtn.addEventListener('click', () => container.style.display = 'none');
+
+  function addMessage(text, className, html = false) {
+    const div = document.createElement('div');
+    div.className = className;
+    if (html) div.innerHTML = text;
+    else div.textContent = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+    addMessage(text, 'user-message');
+    input.value = '';
+    messages.scrollTop = messages.scrollHeight;
+
+    setTimeout(() => processMessage(text.toLowerCase()), 400);
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+  input.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+
+  options.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const option = btn.dataset.option;
+      if (btn.id === 'whatsapp-chat') {
+        window.open('https://wa.me/254712328599', '_blank');
+      } else {
+        input.value = option;
+        sendMessage();
+      }
+    });
+  });
+
+  function processMessage(text) {
+    if (text.includes('service') || text.includes('services')) {
+      fetch('services.json')
+        .then(res => res.json())
+        .then(data => {
+          if (!data.length) return addMessage('No services available.', 'bot-message');
+          addMessage('Here are our main services:', 'bot-message');
+
+          data.forEach(service => {
+            const content = `
+              <div style="border:1px solid #ccc; padding:8px; margin:5px 0; border-radius:8px;">
+                <img src="${service.image}" alt="${service.title}" style="width:80px; height:80px; object-fit:contain; float:left; margin-right:10px;">
+                <strong>${service.title}</strong><br>
+                <small>${service.description}</small><br>
+                <button class="service-chat-btn" data-id="${service.id}">Read More</button>
+                <button class="book-service-btn" data-title="${service.title}">Book Now</button>
+                <div style="clear:both;"></div>
+              </div>
+            `;
+            addMessage(content, 'bot-message', true);
+          });
+
+          document.querySelectorAll('.service-chat-btn').forEach(btn => {
+            btn.addEventListener('click', () => openServicePage(btn.dataset.id));
+          });
+
+          document.querySelectorAll('.book-service-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              showPage('booking');
+              if (bookingForm) {
+                const msgField = bookingForm.querySelector('textarea[name="message"]');
+                if (msgField) msgField.value = `Booking request for: ${btn.dataset.title}`;
+              }
+              addMessage(`Booking form opened for: ${btn.dataset.title}`, 'bot-message');
+            });
+          });
+        });
+    } else if (text.includes('book')) {
+      showPage('booking');
+      addMessage('Booking form is now open. Please fill in your details.', 'bot-message');
+    } else if (text.includes('location')) {
+      showPage('location');
+      addMessage('Our main branch is in Nairobi, Kenya. Check the map above.', 'bot-message');
+    } else if (text.includes('contact')) {
+      showPage('contact');
+      addMessage('You can call 0712328599, email info@hybridservice.com, or click WhatsApp to chat.', 'bot-message');
+    } else {
+      addMessage('I did not understand. Type "services", "book", "location", or click WhatsApp.', 'bot-message');
     }
-  };
+  }
+
+  // ===== Show page from URL hash =====
+  if (window.location.hash) {
+    const hash = window.location.hash.replace('#', '');
+    showPage(hash);
+  }
+
 });
-
-document.getElementById("whatsapp-chat").onclick = () => {
-  window.open("https://wa.me/254712328599", "_blank");
-};
