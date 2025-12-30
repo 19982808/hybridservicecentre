@@ -1,140 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hybrid Vehicle Service Center Nairobi | Hybrid & EV Specialists</title>
-    <meta name="description" content="Hybrid Vehicle Service Center in Nairobi offering hybrid diagnostics, battery repair, EV servicing, software updates, and maintenance.">
-    <meta name="keywords" content="Hybrid vehicle service Nairobi, hybrid battery repair Kenya, EV service Nairobi">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hybrid Vehicle Service Center Nairobi | Hybrid & EV Specialists</title>
+  <meta name="description" content="Hybrid Vehicle Service Center in Nairobi offering hybrid diagnostics, battery repair, EV servicing, software updates, and maintenance.">
+  <meta name="keywords" content="Hybrid vehicle service Nairobi, hybrid battery repair Kenya, EV service Nairobi">
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
 <!-- ================= HEADER ================= -->
 <header class="site-header">
-    <div class="container header-container">
-        <button class="menu-toggle" aria-label="Toggle Menu">
-            <i class="fas fa-bars"></i>
-        </button>
-        <img src="logo.png" alt="Hybrid Vehicle Service Center Nairobi" class="logo">
-        <nav class="main-nav">
-            <ul>
-                <li><a href="#" data-page="home">Home</a></li>
-                <li><a href="#" data-page="about">About</a></li>
-                <li><a href="#" data-page="our-services">Our Services</a></li>
-                <li><a href="#" data-page="booking">Book</a></li>
-                <li><a href="#" data-page="contact">Contact</a></li>
-                <li><a href="#" data-page="location">Location</a></li>
-            </ul>
-        </nav>
-    </div>
+  <div class="container header-container">
+    <button class="menu-toggle" aria-label="Toggle Menu">
+      <i class="fas fa-bars"></i>
+    </button>
+    <img src="logo.png" alt="Hybrid Vehicle Service Center Nairobi" class="logo">
+    <nav class="main-nav">
+      <ul>
+        <li><a href="#" data-page="home">Home</a></li>
+        <li><a href="#" data-page="about">About</a></li>
+        <li><a href="#" data-page="our-services">Our Services</a></li>
+        <li><a href="#" data-page="booking">Book</a></li>
+        <li><a href="#" data-page="contact">Contact</a></li>
+        <li><a href="#" data-page="location">Location</a></li>
+        <li><a href="#" data-page="payment">Payment</a></li>
+        <li><a href="#" data-page="our-links">Our Links</a></li>
+      </ul>
+    </nav>
+  </div>
 </header>
 
 <!-- ================= HOME ================= -->
 <section id="home" class="page active">
-    <div class="hero">
-        <div class="slideshow">
-            <div class="slide active" style="background-image:url('hero1.png')"></div>
-            <div class="slide" style="background-image:url('hero2.png')"></div>
-            <div class="slide" style="background-image:url('hero3.png')"></div>
-            <div class="slide" style="background-image:url('hero4.png')"></div>
-        </div>
-        <div class="hero-content">
-            <h1>Hybrid Vehicle Service Center in Nairobi</h1>
-            <p>Hybrid Diagnostics • Battery Repair • EV Maintenance</p>
-            <a href="#" data-page="booking" class="cta">Book Service</a>
-        </div>
-        <div class="dots"></div>
+  <div class="hero">
+    <div class="slideshow">
+      <div class="slide active" style="background-image:url('hero1.png')"></div>
+      <div class="slide" style="background-image:url('hero2.png')"></div>
+      <div class="slide" style="background-image:url('hero3.png')"></div>
+      <div class="slide" style="background-image:url('hero4.png')"></div>
     </div>
+    <div class="hero-content">
+      <h1>Hybrid Vehicle Service Center in Nairobi</h1>
+      <p>Hybrid Diagnostics • Battery Repair • EV Maintenance</p>
+      <a href="#" data-page="booking" class="cta">Book Service</a>
+    </div>
+    <div class="dots"></div>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section id="about" class="page">
+  <div class="container">
+    <h2>About Us</h2>
+    <p>We are Nairobi’s leading hybrid and electric vehicle service specialists. Our team provides diagnostics, maintenance, battery repair, software updates, and full-service care for hybrid and EV vehicles.</p>
+  </div>
 </section>
 
 <!-- ================= OUR SERVICES ================= -->
 <section id="our-services" class="page">
-    <div class="container">
-        <h2>Hybrid & Electric Vehicle Services</h2>
-        <div class="service-grid"></div>
-    </div>
+  <div class="container">
+    <h2>Hybrid & Electric Vehicle Services</h2>
+    <div class="service-grid"></div>
+  </div>
 </section>
 
 <!-- ================= SERVICE DETAIL ================= -->
-<section id="service-detail" class="page" style="display:none;">
-    <div class="container">
-        <div class="service-detail-content"></div>
-    </div>
+<section id="service-detail" class="page" style="display: none;">
+  <div class="container">
+    <div class="service-detail-content"></div>
+    <button id="back-to-services">Back to Our Services</button>
+  </div>
 </section>
 
 <!-- ================= BOOKING ================= -->
-<section id="booking" class="page" style="display:none;">
-    <div class="container">
-        <h2>Book Hybrid Vehicle Service</h2>
-        <form id="bookingForm" action="https://formspree.io/f/xxxxxxx" method="POST">
-            <input type="text" name="name" placeholder="Full Name" required>
-            <input type="email" name="email" placeholder="Email Address" required>
-            <input type="tel" name="phone" placeholder="Phone Number" required>
-            <textarea name="message" placeholder="Vehicle model & issue" required></textarea>
-            <button type="submit">Submit Booking</button>
-        </form>
-    </div>
+<section id="booking" class="page" style="display: none;">
+  <div class="container">
+    <h2>Book Hybrid Vehicle Service</h2>
+    <form id="bookingForm" action="https://formspree.io/f/xxxxxxx" method="POST">
+      <input type="text" name="name" placeholder="Full Name" required>
+      <input type="email" name="email" placeholder="Email Address" required>
+      <input type="tel" name="phone" placeholder="Phone Number" required>
+      <textarea name="message" placeholder="Vehicle model & issue" required></textarea>
+      <button type="submit">Submit Booking</button>
+    </form>
+  </div>
 </section>
 
 <!-- ================= CONTACT ================= -->
 <section id="contact" class="page">
-    <div class="container">
-        <h2>Contact Hybrid Vehicle Service Center</h2>
-        <p>
-            📍 <a href="https://www.google.com/maps/place/Nairobi,+Kenya" target="_blank">Nairobi, Kenya</a><br>
-            📞 <a href="tel:+254712328599">0712328599</a><br>
-            📧 <a href="mailto:info@hybridservice.com">info@hybridservice.com</a>
-        </p>
-        <div class="social-icons">
-            <a href="https://www.facebook.com/" target="_blank"><i class="fab fa-facebook-f"></i></a>
-            <a href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram"></i></a>
-            <a href="https://www.tiktok.com/" target="_blank"><i class="fab fa-tiktok"></i></a>
-            <a href="https://wa.me/254712328599" target="_blank"><i class="fab fa-whatsapp"></i></a>
-        </div>
+  <div class="container">
+    <h2>Contact Hybrid Vehicle Service Center</h2>
+    <p>
+      📍 <a href="https://www.google.com/maps/place/Nairobi,+Kenya" target="_blank">Nairobi, Kenya</a><br>
+      📞 <a href="tel:+254712328599">0712328599</a><br>
+      📧 <a href="mailto:info@hybridservice.com">info@hybridservice.com</a>
+    </p>
+    <div class="social-icons">
+      <a href="https://www.facebook.com/" target="_blank"><i class="fab fa-facebook-f"></i></a>
+      <a href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram"></i></a>
+      <a href="https://www.tiktok.com/" target="_blank"><i class="fab fa-tiktok"></i></a>
+      <a href="https://wa.me/254712328599" target="_blank"><i class="fab fa-whatsapp"></i></a>
     </div>
+  </div>
 </section>
 
 <!-- ================= LOCATION ================= -->
 <section id="location" class="page">
-    <div class="container">
-        <h2>Our Location</h2>
-        <p>Naivasha road, Dagoretti Corner next to Shell petrol station</p>
-        <iframe loading="lazy" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3970.432296770214!2d36.72631711428864!3d-1.3290983359566765!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f1c1c1c1c1c1c%3A0x1c1c1c1c1c1c1c!2sNaivasha%20Road%2C%20Dagoretti%20Corner%20next%20to%20Shell%20petrol%20station!5e0!3m2!1sen!2ske!4v1614692322442!5m2!1sen!2ske" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-    </div>
+  <div class="container">
+    <h2>Our Location</h2>
+    <p>Naivasha Road, Dagoretti Corner next to Shell petrol station</p>
+    <iframe loading="lazy" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3970.432296770214!2d36.72631711428864!3d-1.3290983359566765!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f1c1c1c1c1c1c%3A0x1c1c1c1c1c1c1c!2sNaivasha%20Road%2C%20Dagoretti%20Corner%20next%20to%20Shell%20petrol%20station!5e0!3m2!1sen!2ske!4v1614692322442!5m2!1sen!2ske" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+  </div>
+</section>
+
+<!-- ================= PAYMENT ================= -->
+<section id="payment" class="page">
+  <div class="container">
+    <h2>Payment Options</h2>
+    <p>We accept mobile payments (M-Pesa), bank transfers, and card payments for all services.</p>
+  </div>
+</section>
+
+<!-- ================= OUR LINKS ================= -->
+<section id="our-links" class="page">
+  <div class="container">
+    <h2>Useful Links</h2>
+    <ul>
+      <li><a href="https://www.hybridservice.com/blog" target="_blank">Blog</a></li>
+      <li><a href="https://www.hybridservice.com/faq" target="_blank">FAQ</a></li>
+      <li><a href="https://www.hybridservice.com/terms" target="_blank">Terms & Conditions</a></li>
+      <li><a href="https://www.hybridservice.com/privacy" target="_blank">Privacy Policy</a></li>
+    </ul>
+  </div>
 </section>
 
 <!-- ================= FOOTER ================= -->
 <footer>
-    <p>© 2025 Hybrid Vehicle Service Center Nairobi</p>
+  <p>© 2025 Hybrid Vehicle Service Center Nairobi</p>
 </footer>
 
 <!-- ================= CHATBOT ================= -->
 <button id="chatbot-toggle" title="Chat with us"><i class="fas fa-robot"></i></button>
-<div id="chatbot-container" style="display:none;">
-    <div id="chatbot-header">
-        Hybrid Assistant
-        <button id="chatbot-close">✖</button>
-    </div>
-    <div id="chatbot-messages"></div>
-    <div id="chatbot-options">
-        <button data-option="services">Our Services</button>
-        <button data-option="book">Book</button>
-        <button data-option="location">Location</button>
-        <button id="whatsapp-chat">WhatsApp</button>
-    </div>
-    <div id="chatbot-input-area">
-        <input id="chatbot-input" placeholder="Type a message...">
-        <button id="chatbot-send">Send</button>
-    </div>
+
+<div id="chatbot-container" style="display: none;">
+  <div id="chatbot-header">
+    Hybrid Assistant
+    <button id="chatbot-close">✖</button>
+  </div>
+  <div id="chatbot-messages"></div>
+  <div id="chatbot-options">
+    <button data-option="services">Our Services</button>
+    <button data-option="book">Book</button>
+    <button data-option="location">Location</button>
+    <button id="whatsapp-chat">WhatsApp</button>
+  </div>
+  <div id="chatbot-input-area">
+    <input id="chatbot-input" placeholder="Type a message...">
+    <button id="chatbot-send">Send</button>
+  </div>
 </div>
 
-<!-- ================= SCRIPTS ================= -->
 <script src="script.js"></script>
 <script src="chatbot.js"></script>
 </body>
 </html>
+
