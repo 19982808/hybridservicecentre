@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } else if (text.includes('location')) {
       showPage('location');
-      addMessage('Our location is shown on the map.', 'bot-message');
+      addMessage('Our location is  Naivasha road, Dagoretti Corner next ro Shell petrol station.', 'bot-message');
 
     } else if (text.includes('contact')) {
       showPage('contact');
