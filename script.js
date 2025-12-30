@@ -1,5 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+  /* ================= NAVBAR SCROLL EFFECT ================= */
+  const header = document.querySelector('.site-header');
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
   /* ================= SPA NAVIGATION ================= */
   const navLinks = document.querySelectorAll('[data-page]');
   const pages = document.querySelectorAll('.page');
@@ -19,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Load page from URL hash
   const hash = window.location.hash.replace('#', '');
   if (hash && document.getElementById(hash)) showPage(hash);
   else showPage('home');
@@ -28,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const slides = document.querySelectorAll('.slide');
   const dotsContainer = document.querySelector('.dots');
   let currentSlide = 0;
+  let slideInterval;
 
   if (slides.length && dotsContainer) {
     slides.forEach((_, i) => {
@@ -47,9 +58,20 @@ document.addEventListener('DOMContentLoaded', () => {
       currentSlide = index;
     }
 
-    setInterval(() => {
-      showSlide((currentSlide + 1) % slides.length);
-    }, 5000);
+    function startSlideshow() {
+      slideInterval = setInterval(() => {
+        showSlide((currentSlide + 1) % slides.length);
+      }, 5000);
+    }
+
+    function stopSlideshow() {
+      clearInterval(slideInterval);
+    }
+
+    startSlideshow();
+
+    document.querySelector('.hero')?.addEventListener('mouseenter', stopSlideshow);
+    document.querySelector('.hero')?.addEventListener('mouseleave', startSlideshow);
   }
 
   /* ================= BOOKING FORM ================= */
@@ -57,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (bookingForm) {
     bookingForm.addEventListener('submit', e => {
       e.preventDefault();
+
       fetch(bookingForm.action, {
         method: bookingForm.method,
         body: new FormData(bookingForm),
@@ -64,13 +87,13 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .then(res => {
         if (res.ok) {
-          alert('Booking submitted!');
+          alert('Booking submitted successfully!');
           bookingForm.reset();
         } else {
-          alert('Booking failed!');
+          alert('Booking failed. Try again.');
         }
       })
-      .catch(() => alert('Network error'));
+      .catch(() => alert('Network error. Please try again.'));
     });
   }
 
@@ -80,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let servicesCache = [];
 
   if (serviceGrid) {
-    fetch('services.json') // Ensure services.json is in the same folder
+    fetch('./services.json')   // 🔴 MUST be same folder as index.html
       .then(res => res.json())
       .then(data => {
         servicesCache = data;
@@ -90,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const card = document.createElement('div');
           card.className = 'service-card';
           card.innerHTML = `
-            <img src="${service.image}" alt="${service.title}" style="width:100px;height:100px;object-fit:contain;">
+            <img src="${service.image}" alt="${service.title}">
             <h3>${service.title}</h3>
             <p>${service.shortDescription}</p>
             <button class="read-more-btn" data-id="${service.id}">Read More</button>
@@ -111,13 +134,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     serviceDetail.innerHTML = `
       <h2>${service.title}</h2>
-      <img src="${service.image}" alt="${service.title}" style="max-width:100%;margin:20px 0;">
+      <img src="${service.image}" alt="${service.title}">
       <p>${service.fullDescription}</p>
       <h4>What This Service Includes:</h4>
       <ul>
         ${service.includes.map(item => `<li>${item}</li>`).join('')}
       </ul>
-      <button id="back-to-services">Back to Our Services</button>
+      <button id="back-to-services">← Back to Services</button>
     `;
 
     showPage('service-detail');
